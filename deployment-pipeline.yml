@@ -1,0 +1,24 @@
+stages:
+- stage: Deployment
+  jobs:
+  - job: 
+    displayName: Deployment Job
+    pool:
+      vmImage: 'windows-2019'
+    steps:
+    # BUNDLE FUNCTION
+    - task: ArchiveFiles@2
+      inputs:
+        rootFolderOrFile: '$(System.DefaultWorkingDirectory)/'
+        includeRootFolder: false
+        archiveType: 'zip'
+        archiveFile: '$(System.DefaultWorkingDirectory)/output.zip'
+        replaceExistingArchive: true
+    # DEPLOY FUNCTION
+    - task: AzureFunctionApp@1
+      inputs:
+        azureSubscription: '($fx.subscription)'
+        appType: 'functionApp'
+        appName: 'bitnaughts'
+        package: '$(System.DefaultWorkingDirectory)/output.zip'
+        deploymentMethod: 'auto'
