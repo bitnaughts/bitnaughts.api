@@ -17,7 +17,7 @@ stages:
     # DEPLOY FUNCTION
     - task: AzureFunctionApp@1
       inputs:
-        azureSubscription: '($fx.subscription)'
+        azureSubscription: '$(fx.subscription)'
         appType: 'functionApp'
         appName: 'bitnaughts'
         package: '$(System.DefaultWorkingDirectory)/output.zip'
