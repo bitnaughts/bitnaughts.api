@@ -25,7 +25,7 @@ namespace BitNaughts
             string query =  "SELECT alias" +
                             "FROM " + req.Query["db"];
 
-            output += "\n" + query "\n";
+            output += "\n" + query + "\n";
 
             SqlConnection connectionString = new SqlConnection(System.Environment.GetEnvironmentVariable("Connection String"));
             SqlCommand querystring = new SqlCommand( database_name, connectionString);
