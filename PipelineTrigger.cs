@@ -22,7 +22,7 @@ namespace BitNaughts
             
             string output = "STRING: " + System.Environment.GetEnvironmentVariable("Connection String").ToString();
 
-            string query =  "SELECT alias" +
+            string query =  "SELECT alias " +
                             "FROM " + req.Query["db"];
 
             output += "\n" + query + "\n";
