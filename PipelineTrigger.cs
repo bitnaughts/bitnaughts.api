@@ -27,17 +27,17 @@ namespace BitNaughts
 
             output += "\n" + query + "\n";
 
-            SqlConnection connectionString = new SqlConnection(System.Environment.GetEnvironmentVariable("Connection String"));
-            SqlCommand querystring = new SqlCommand( database_name, connectionString);
+            SqlConnection connection = new SqlConnection(System.Environment.GetEnvironmentVariable("Connection String"));
+            SqlCommand command = new SqlCommand(query, connection);
 
             try
             {
-                using (connectionString)
+                using (connection)
                 {
                     output = "Connection Established";
-                    connectionString.Open();
+                    connection.Open();
 
-                    SqlDataReader reader = querystring.ExecuteReader();
+                    SqlDataReader reader = command.ExecuteReader();
 
                     Object[] values = new Object[reader.FieldCount];
                     int fieldCount = reader.GetValues(values);
@@ -47,7 +47,7 @@ namespace BitNaughts
                         output += values[i];
                     
                     reader.Close();
-                    connectionString.Close();
+                    connection.Close();
 
                 }
             }
