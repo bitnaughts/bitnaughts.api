@@ -16,7 +16,7 @@ namespace ModestoMoves
     public static class FunctionApp
     {
         [FunctionName("GetPlayers")]
-        public static async Task<JObject> GetPlayers(
+        public static async Task<string> GetPlayers(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "GetPlayers")] HttpRequest req,
             ILogger log)
         {
@@ -53,10 +53,10 @@ namespace ModestoMoves
             }
             catch (Exception ex)
             {
-                return new JObject().Add("Error", ex);
+                return ex.ToString() + output;
             }
 
-            return new JObject().Add("Output", output);
+            return output;
         }
     }
 }
