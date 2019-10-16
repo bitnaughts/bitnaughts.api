@@ -36,7 +36,7 @@ namespace ModestoMoves
             {
                 using (connectionString)
                 {
-                    output = "Connection Established");
+                    output = "Connection Established";
                     connectionString.Open();
 
                     SqlDataReader reader = querystring.ExecuteReader();
