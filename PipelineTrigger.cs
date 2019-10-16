@@ -34,7 +34,7 @@ namespace BitNaughts
             {
                 using (connection)
                 {
-                    output = "Connection Established";
+                    output += "Connection Established";
                     connection.Open();
 
                     SqlDataReader reader = command.ExecuteReader();
