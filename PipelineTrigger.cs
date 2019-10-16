@@ -21,12 +21,10 @@ namespace ModestoMoves
             ILogger log)
         {
             log.LogInformation("Running Racing Route");
+            
             string output = "";
 
-            string raceID = req.Query["raceID"];
-
-            List<decimal> latList = new List<decimal>();
-            List<decimal> longList = new List<decimal>();
+            // string raceID = req.Query["raceID"];
 
             SqlConnection connectionString = new SqlConnection(System.Environment.GetEnvironmentVariable("Connection String"));
             SqlCommand querystring = new SqlCommand("SELECT alias FROM bitnaughts-db.Players", connectionString);
@@ -55,38 +53,10 @@ namespace ModestoMoves
             }
             catch (Exception ex)
             {
-                return null;
+                return new JObject().Add("Error", ex);
             }
 
-            List<Decimal[]> cords = new List<Decimal[]>();
-            for(int i = 0; i < latList.Count; i++)
-            {
-                decimal[] arrayOfInt = {latList[i], longList[i]};
-                cords.Add(arrayOfInt);
-            }
-
-            var jobject = new
-            {
-                id = output,
-                type = "line",
-                source = new
-                {
-                    type = "geojson",
-                    data = new
-                    {
-                        type = "Feature",
-                        properties = new { },
-                        geometry = new
-                        {
-                            type = "LineString",
-                            coordinates = cords
-                        }
-
-                    }
-                }
-            };
-
-            return JObject.FromObject(jobject);
+            return new JObject().Add("Output", output)
         }
     }
 }
