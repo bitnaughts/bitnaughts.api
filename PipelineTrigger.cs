@@ -56,7 +56,7 @@ namespace ModestoMoves
                 return new JObject().Add("Error", ex);
             }
 
-            return new JObject().Add("Output", output)
+            return new JObject().Add("Output", output);
         }
     }
 }
