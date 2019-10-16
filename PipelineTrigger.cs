@@ -6,12 +6,10 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 
-namespace ModestoMoves
+namespace BitNaughts
 {
     public static class FunctionApp
     {
@@ -22,13 +20,15 @@ namespace ModestoMoves
         {
             log.LogInformation("Running Racing Route");
             
-            string output = "";
+            string output = "STRING: " + System.Environment.GetEnvironmentVariable("Connection String").ToString();
 
-            // string raceID = req.Query["raceID"];
+            string query =  "SELECT alias" +
+                            "FROM " + req.Query["db"];
+
+            output += "\n" + query "\n";
 
             SqlConnection connectionString = new SqlConnection(System.Environment.GetEnvironmentVariable("Connection String"));
-            SqlCommand querystring = new SqlCommand("SELECT alias FROM bitnaughts-db.Players", connectionString);
-
+            SqlCommand querystring = new SqlCommand( database_name, connectionString);
 
             try
             {
