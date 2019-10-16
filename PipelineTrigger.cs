@@ -29,7 +29,7 @@ namespace ModestoMoves
             List<decimal> longList = new List<decimal>();
 
             SqlConnection connectionString = new SqlConnection(System.Environment.GetEnvironmentVariable("Connection String"));
-            SqlCommand querystring = new SqlCommand("SELECT alias FROM Players", connectionString);
+            SqlCommand querystring = new SqlCommand("SELECT alias FROM bitnaughts-db.Players", connectionString);
 
 
             try
