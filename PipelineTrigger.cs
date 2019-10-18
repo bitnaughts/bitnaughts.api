@@ -1,62 +1,59 @@
 using System;
+using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.IO;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using System.Collections.Generic;
-using System.Data.SqlClient;
 
-namespace BitNaughts
-{
-    public static class FunctionApp
-    {
-        [FunctionName("GetPlayers")]
-        public static async Task<string> GetPlayers(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "GetPlayers")] HttpRequest req,
-            ILogger log)
-        {
-            log.LogInformation("Running Racing Route");
-            
-            string output = "STRING: " + System.Environment.GetEnvironmentVariable("Connection String").ToString();
+namespace BitNaughts {
+    public static class FunctionApp {
 
-            string query =  "SELECT alias " +
-                            "FROM " + req.Query["db"];
+        /* Flag for Error Messages from database connection or execution */
+        public const string ERROR_MESSAGE = "ERROR";
 
-            output += "\n" + query + "\n";
+        /* Helper Function for managing database connection, running commands, and returning results */
+        public static string[] ExecuteQuery (string query) {
+            try {
+                /* Defines connection parameters and query logic */
+                SqlConnection connection = new SqlConnection (System.Environment.GetEnvironmentVariable ("Connection String"));
+                SqlCommand command = new SqlCommand (query, connection);
 
-            SqlConnection connection = new SqlConnection(System.Environment.GetEnvironmentVariable("Connection String"));
-            SqlCommand command = new SqlCommand(query, connection);
+                /* Connects to database and executes query */
+                connection.Open ();
+                SqlDataReader reader = command.ExecuteReader ();
 
-            try
-            {
-                using (connection)
-                {
-                    output += "Connection Established";
-                    connection.Open();
+                /* Stores the returned rows into an Object array */
+                Object[] rows = new Object[reader.FieldCount];
+                int fieldCount = reader.GetValues (rows);
 
-                    SqlDataReader reader = command.ExecuteReader();
+                /* Closes the database connection */
+                reader.Close ();
+                connection.Close ();
 
-                    Object[] values = new Object[reader.FieldCount];
-                    int fieldCount = reader.GetValues(values);
+                return (string[])rows; // Probably not possible without explicit typecasting
 
-                    output += "reader.GetValues retrieved " + fieldCount + "columns.";
-                    for (int i = 0; i < fieldCount; i++)
-                        output += values[i];
-                    
-                    reader.Close();
-                    connection.Close();
-
-                }
+            } catch (Exception ex) {
+                return new string[] { ERROR_MESSAGE, ex.ToString () };
             }
-            catch (Exception ex)
-            {
-                return ex.ToString() + output;
-            }
+        }
 
-            return output;
+        [FunctionName ("GetPlayers")]
+        public static async Task<string> GetPlayers ([HttpTrigger (AuthorizationLevel.Anonymous, "get", Route = "GetPlayers")] HttpRequest req, ILogger log) {
+
+            log.LogInformation ("Getting Players");
+
+            string[] rows = ExecuteQuery (
+                String.Format (
+                    "SELECT alias FROM {0}",
+                    req.Query["db"]
+                )
+            );
+
+            return String.Join ("\n", rows);
         }
     }
 }
