@@ -41,19 +41,26 @@ namespace BitNaughts {
             }
         }
 
-        [FunctionName ("GetPlayers")]
+        [FunctionName ("GetPlayers")] /* API Endpoint: /api/GetPlayers?db=database-name */
         public static async Task<string> GetPlayers ([HttpTrigger (AuthorizationLevel.Anonymous, "get", Route = "GetPlayers")] HttpRequest req, ILogger log) {
 
-            log.LogInformation ("Getting Players");
+            /* Returning result of query */
+            return String.Join (
 
-            string[] rows = ExecuteQuery (
-                String.Format (
-                    "SELECT alias FROM {0}",
-                    req.Query["db"]
+                /* Result row separator */
+                "\n",
+                ExecuteQuery (
+                    String.Format (
+                        
+                        /* SQL Query to be executed */
+                        "SELECT alias FROM {0}",
+                        req.Query["db"]
+                    )
                 )
             );
-
-            return String.Join ("\n", rows);
         }
+
+
+
     }
 }
