@@ -3,11 +3,8 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.IO;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.Extensions.Logging;
 
 namespace BitNaughts {
     public static class FunctionApp {
@@ -34,7 +31,8 @@ namespace BitNaughts {
                 reader.Close ();
                 connection.Close ();
 
-                return (string[])rows; // Probably not possible without explicit typecasting
+                /* Return rows as strings */
+                return (string[])rows;
 
             } catch (Exception ex) {
                 return new string[] { ERROR_MESSAGE, ex.ToString () };
