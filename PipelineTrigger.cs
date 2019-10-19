@@ -37,7 +37,7 @@ namespace BitNaughts {
                 return (string[])rows;
 
             } catch (Exception ex) {
-                return new string[] { ERROR_MESSAGE, ex.ToString (), System.Environment.GetEnvironmentVariable ("Connection String").ToString()};
+                return new string[] { ERROR_MESSAGE, ex.ToString (), "QUERY", query, System.Environment.GetEnvironmentVariable ("Connection String").ToString()};
             }
         }
 
