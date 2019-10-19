@@ -12,39 +12,52 @@ using Microsoft.Extensions.Logging;
 namespace BitNaughts {
     public static class FunctionApp {
 
-        /* Flag for Error Messages from database connection or execution */
+        public const string DELIMITER = ",";
+        public const string NEW_LINE = "\n";
         public const string ERROR_MESSAGE = "ERROR";
 
         /* Helper Function for managing database connection, running commands, and returning results */
         public static string[] ExecuteQuery (string query) {
             try {
                 /* Defines connection parameters and query logic */
-                SqlConnection connection = new SqlConnection (System.Environment.GetEnvironmentVariable ("Connection String"));
+                SqlConnection connection = new SqlConnection(System.Environment.GetEnvironmentVariable ("Connection String"));
                 SqlCommand command = new SqlCommand (query, connection);
 
                 /* Connects to database and executes query */
                 connection.Open ();
                 SqlDataReader reader = command.ExecuteReader ();
 
-                /* Stores the returned rows into an Object array */
-                Object[] rows = new Object[reader.FieldCount];
-                reader.GetValues (rows);
+                /* Holds row results as they are read */
+                List<string> results = new List<string>();
+                while (reader.Read())
+                {
+                    /* Dumps values into Object array */
+                    Object[] fields = new Object[reader.FieldCount];
+                    reader.GetValues(fields);
+
+                    /* Adds row result as delimiter-seperated values */
+                    results.Add(
+                        String.Join (
+                            DELIMITER,
+                            fields.Where(x => x != null)
+                                  .Select(x => x.ToString())
+                                  .ToArray()
+                        )
+                    );
+                }
 
                 /* Closes the database connection */
-                reader.Close ();
-                connection.Close ();
+                reader.Close();
+                connection.Close();
 
-                /* Return results converted to string */
-                return rows.Where (x => x != null)
-                           .Select (x => x.ToString ())
-                           .ToArray ();
+                /* Returns array of strings, one string per row returned from query */
+                return results.ToArray();
 
             } catch (Exception ex) {
                 return new string[] {
                     ERROR_MESSAGE,
                     ex.ToString (),
-                    query,
-                    System.Environment.GetEnvironmentVariable ("Connection String").ToString ()
+                    query
                 };
             }
         }
@@ -56,7 +69,7 @@ namespace BitNaughts {
             return String.Join (
 
                 /* Result row separator */
-                "\n",
+                NEW_LINE,
                 ExecuteQuery (
                     String.Format (
 
