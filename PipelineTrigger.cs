@@ -60,8 +60,8 @@ namespace BitNaughts {
             );
         }
 
-        [FunctionName ("testing")] /* API Endpoint: /api/testing?q=query */
-        public static async Task<string> GetPlayers ([HttpTrigger (AuthorizationLevel.Anonymous, "get", Route = "testing")] HttpRequest req, ILogger log) {
+        [FunctionName ("Testing")] /* API Endpoint: /api/Testing?q=query */
+        public static async Task<string> Testing ([HttpTrigger (AuthorizationLevel.Anonymous, "get", Route = "Testing")] HttpRequest req, ILogger log) {
 
             /* Returning result of query */
             return String.Join (
