@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.WebJobs;
@@ -33,11 +34,18 @@ namespace BitNaughts {
                 reader.Close ();
                 connection.Close ();
 
-                /* Return rows as strings */
-                return (string[])rows;
+                /* Return results converted to string */
+                return rows.Where (x => x != null)
+                           .Select (x => x.ToString ())
+                           .ToArray ();
 
             } catch (Exception ex) {
-                return new string[] { ERROR_MESSAGE, ex.ToString (), "QUERY", query, System.Environment.GetEnvironmentVariable ("Connection String").ToString()};
+                return new string[] {
+                    ERROR_MESSAGE,
+                    ex.ToString (),
+                    query,
+                    System.Environment.GetEnvironmentVariable ("Connection String").ToString ()
+                };
             }
         }
 
@@ -51,7 +59,7 @@ namespace BitNaughts {
                 "\n",
                 ExecuteQuery (
                     String.Format (
-                        
+
                         /* SQL Query to be executed */
                         "SELECT alias FROM {0}",
                         req.Query["db"]
@@ -70,15 +78,13 @@ namespace BitNaughts {
                 "\n",
                 ExecuteQuery (
                     String.Format (
-                        
+
                         /* SQL Query to be executed */
                         req.Query["q"]
                     )
                 )
             );
         }
-
-
 
     }
 }
