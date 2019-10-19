@@ -25,7 +25,7 @@ namespace BitNaughts {
 
                 /* Stores the returned rows into an Object array */
                 Object[] rows = new Object[reader.FieldCount];
-                int fieldCount = reader.GetValues (rows);
+                reader.GetValues (rows);
 
                 /* Closes the database connection */
                 reader.Close ();
@@ -35,7 +35,7 @@ namespace BitNaughts {
                 return (string[])rows;
 
             } catch (Exception ex) {
-                return new string[] { ERROR_MESSAGE, ex.ToString () };
+                return new string[] { ERROR_MESSAGE, ex.ToString (), System.Environment.GetEnvironmentVariable ("Connection String").ToString()};
             }
         }
 
