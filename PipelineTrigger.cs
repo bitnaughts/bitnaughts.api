@@ -71,11 +71,9 @@ namespace BitNaughts {
                 /* Result row separator */
                 NEW_LINE,
                 ExecuteQuery (
-                    String.Format (
 
-                        /* SQL Query to be executed */
-                        "SELECT alias FROM dbo.Players",
-                    )
+                    /* SQL Query to be executed */
+                    "SELECT alias FROM dbo.Players"
                 )
             );
         }
