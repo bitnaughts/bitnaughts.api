@@ -16,64 +16,123 @@ namespace BitNaughts {
         public const string NEW_LINE = "\n";
         public const string ERROR_MESSAGE = "ERROR";
 
-        /* Helper Function for managing database connection, running commands, and returning results */
-        public static string[] ExecuteQuery (string query) {
-            try {
-                /* Defines connection parameters and query logic */
-                SqlConnection connection = new SqlConnection(System.Environment.GetEnvironmentVariable ("Connection String"));
-                SqlCommand command = new SqlCommand (query, connection);
+        /* Database Schema:
+         * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+         * Galaxies(g_galaxy_id, g_seed)                               *
+         * SystemLinks(sl_galaxy_id, sl_system_id)                     *
+         * Systems(s_system_id, s_seed)                                *
+         * PlanetLinks(pl_system_id, pl_planet_id)                     *
+         * Planets(p_planet_id, p_seed)                                *
+         * AsteroidLinks(al_system_id, al_asteroid_id)                 *
+         * Asteroids(a_asteroid_id, a_size, a_seed)                    *
+         * Players(py_player_id, py_name, py_password)                 *
+         * Owns(o_player_id, o_ship_id)                                *
+         * Ships(sh_ship_id, sh_name, sh_position_x, sh_position_y)    *
+         * FightAt(fa_ship_1_id, fa_ship_2_id, fa_system_id, fa_date)  *
+         * Visits(v_ship_id, v_planet_id, v_date)                      *
+         * Mines(m_ship_id, m_asteroid_id, m_amount, m_date)           *
+         * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *         
+         */
 
-                /* Connects to database and executes query */
-                connection.Open ();
-                SqlDataReader reader = command.ExecuteReader ();
-
-                /* Holds row results as they are read */
-                List<string> results = new List<string>();
-                while (reader.Read())
-                {
-                    /* Dumps values into Object array */
-                    Object[] fields = new Object[reader.FieldCount];
-                    reader.GetValues(fields);
-
-                    /* Adds row result as delimiter-seperated values */
-                    results.Add(
-                        String.Join (
-                            DELIMITER,
-                            fields.Where(x => x != null)
-                                  .Select(x => x.ToString())
-                                  .ToArray()
-                        )
-                    );
-                }
-
-                /* Closes the database connection */
-                reader.Close();
-                connection.Close();
-
-                /* Returns array of strings, one string per row returned from query */
-                return results.ToArray();
-
-            } catch (Exception ex) {
-                return new string[] {
-                    ERROR_MESSAGE,
-                    ex.ToString (),
-                    query
-                };
-            }
-        }
-
-        [FunctionName ("GetPlayers")] /* API Endpoint: /api/GetPlayers */
-        public static async Task<string> GetPlayers ([HttpTrigger (AuthorizationLevel.Anonymous, "get", Route = "GetPlayers")] HttpRequest req, ILogger log) {
+        /* GET ENDPOINTS */
+        [FunctionName ("GetPlayers")] /* API Endpoint: /api/get/players */
+        public static async Task<string> GetPlayers ([HttpTrigger (AuthorizationLevel.Anonymous, "get", Route = "get/players")] HttpRequest req, ILogger log) {
 
             /* Returning result of query */
             return String.Join (
-
-                /* Result row separator */
                 NEW_LINE,
-                ExecuteQuery (
-
+                QueryHandler.ExecuteQuery (
                     /* SQL Query to be executed */
                     "SELECT alias FROM dbo.Players"
+                )
+            );
+        }
+
+        /* ADD ENDPOINTS */
+        [FunctionName ("AddGalaxy")] /* API Endpoint: /api/add/planet */
+        public static async Task<string> AddGalaxy ([HttpTrigger (AuthorizationLevel.Anonymous, "get", Route = "add/galaxy")] HttpRequest req, ILogger log) {
+
+            /* Returning result of query */
+            return String.Join (
+                NEW_LINE,
+                QueryHandler.ExecuteNonQuery (
+                    /* SQL Query to be executed */
+                    String.Format (
+                        "INSERT INTO dbo.Galaxy VALUES ({0}, {1})"
+                        req.Query["id"],
+                        req.Query["seed"],
+                    )
+                )
+            );
+        }
+
+        [FunctionName ("AddSystem")] /* API Endpoint: /api/add/planet */
+        public static async Task<string> AddSystem ([HttpTrigger (AuthorizationLevel.Anonymous, "get", Route = "add/system")] HttpRequest req, ILogger log) {
+
+            /* Returning result of query */
+            return String.Join (
+                NEW_LINE,
+                QueryHandler.ExecuteNonQuery (
+                    /* SQL Query to be executed */
+                    String.Format (
+                        "INSERT INTO dbo.Systems VALUES ({0}, {1})"
+                        req.Query["id"],
+                        req.Query["seed"],
+                    )
+                )
+            );
+        }
+
+        [FunctionName ("AddPlanet")] /* API Endpoint: /api/add/planet */
+        public static async Task<string> AddPlanet ([HttpTrigger (AuthorizationLevel.Anonymous, "get", Route = "add/planet")] HttpRequest req, ILogger log) {
+
+            /* Returning result of query */
+            return String.Join (
+                NEW_LINE,
+                QueryHandler.ExecuteNonQuery (
+                    /* SQL Query to be executed */
+                    String.Format (
+                        "INSERT INTO dbo.Planets VALUES ({0}, {1})"
+                        req.Query["id"],
+                        req.Query["seed"],
+                    )
+                )
+            );
+        }
+
+        [FunctionName ("AddAsteroid")] /* API Endpoint: /api/add/asteroid */
+        public static async Task<string> AddAsteroid ([HttpTrigger (AuthorizationLevel.Anonymous, "get", Route = "add/asteroid")] HttpRequest req, ILogger log) {
+
+            /* Returning result of query */
+            return String.Join (
+                NEW_LINE,
+                QueryHandler.ExecuteNonQuery (
+                    /* SQL Query to be executed */
+                    String.Format (
+                        "INSERT INTO dbo.Asteroids VALUES ({0}, {1}, {2})"
+                        req.Query["id"],
+                        req.Query["seed"],
+                        100
+                    )
+                )
+            );
+        }
+
+        [FunctionName ("AddShip")] /* API Endpoint: /api/add/ship */
+        public static async Task<string> AddShip ([HttpTrigger (AuthorizationLevel.Anonymous, "get", Route = "add/ship")] HttpRequest req, ILogger log) {
+
+            /* Returning result of query */
+            return String.Join (
+                NEW_LINE,
+                QueryHandler.ExecuteNonQuery (
+                    /* SQL Query to be executed */
+                    String.Format (
+                        "INSERT INTO dbo.Ships VALUES ({0}, {1}, {2}, {3})"
+                        req.Query["id"],
+                        req.Query["seed"],
+                        0,
+                        0
+                    )
                 )
             );
         }
@@ -83,12 +142,9 @@ namespace BitNaughts {
 
             /* Returning result of query */
             return String.Join (
-
-                /* Result row separator */
                 NEW_LINE,
-                ExecuteQuery (
+                QueryHandler.ExecuteQuery (
                     String.Format (
-
                         /* SQL Query to be executed */
                         req.Query["q"]
                     )
