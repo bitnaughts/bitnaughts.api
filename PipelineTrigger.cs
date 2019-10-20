@@ -52,8 +52,12 @@ namespace BitNaughts {
         [FunctionName ("AddGalaxy")] /* API Endpoint: /api/add/planet */
         public static async Task<string> AddGalaxy ([HttpTrigger (AuthorizationLevel.Anonymous, "post", Route = "add/galaxy")] HttpRequest req, ILogger log) {
 
+            string data = await req.Content.ReadAsStringAsync();
+            // Here you can process json into an object
+            // dynamic parsed = JsonConvert.DeserializeObject(data);
+
             /* Returning result of query */
-            return req.Query["id"] + req.Query["seed"] + String.Join (
+            return data + req.Query["id"] + req.Query["seed"] + String.Join (
                 NEW_LINE,
                 QueryHandler.ExecuteNonQuery (
                     /* SQL Query to be executed */
