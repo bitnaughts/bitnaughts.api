@@ -60,7 +60,7 @@ namespace BitNaughts {
                     String.Format (
                         "INSERT INTO dbo.Galaxy VALUES ({0}, {1})",
                         req.Query["id"],
-                        req.Query["seed"],
+                        req.Query["seed"]
                     )
                 )
             );
@@ -77,7 +77,7 @@ namespace BitNaughts {
                     String.Format (
                         "INSERT INTO dbo.Systems VALUES ({0}, {1})",
                         req.Query["id"],
-                        req.Query["seed"],
+                        req.Query["seed"]
                     )
                 )
             );
@@ -94,7 +94,7 @@ namespace BitNaughts {
                     String.Format (
                         "INSERT INTO dbo.Planets VALUES ({0}, {1})",
                         req.Query["id"],
-                        req.Query["seed"],
+                        req.Query["seed"]
                     )
                 )
             );
