@@ -73,7 +73,7 @@ namespace BitNaughts {
 
             /* Removes data in table and returns transaction receipt */
             dynamic req_body = await GetBody (req);
-            return QueryHandler.ExecuteQuery (
+            return QueryHandler.ExecuteNonQuery (
                 String.Format (
                     "DELETE FROM {0} WHERE {1}", /* SQL Query to be executed */
                     req.Query["table"],
