@@ -10,16 +10,14 @@ using Nancy.Json;
 
 namespace BitNaughts {
     public static class EndpointHandler {
-
+        
+        /* Result-formatting constants */
         public const string DELIMITER = ",";
         public const string NEW_LINE = "\n";
 
-        /* Assembles HTTP Body byte-stream into JSON */
-        public static async Task<dynamic> GetBody (HttpRequest req) {
-            string requestBody = await new StreamReader (req.Body).ReadToEndAsync ();
-            return Newtonsoft.Json.JsonConvert.DeserializeObject (requestBody);
-        }
-        
+        /* Endpoint Functions */
+        /* * * * * * * * * * */
+
         [FunctionName ("Create")] /* API Endpoint: /api/create?table=players */
         public static async Task<string> Create ([HttpTrigger (AuthorizationLevel.Anonymous, "post", Route = "create")] HttpRequest req, ILogger log) {
 
@@ -40,7 +38,7 @@ namespace BitNaughts {
         [FunctionName ("Read")] /* API Endpoint: /api/read?table=players&fields=* */
         public static async Task<string> Read ([HttpTrigger (AuthorizationLevel.Anonymous, "get", Route = "read")] HttpRequest req, ILogger log) {
 
-            /* Returns CSV formatted result of selection query */
+            /* Returns formatted result of selection query */
             return QueryHandler.ExecuteQuery (
                 String.Format (
                     "SELECT {1} FROM {0}", /* SQL Query to be executed */
@@ -80,6 +78,91 @@ namespace BitNaughts {
                     req_body.condition
                 )
             );
+        }
+
+        /* Helper Functions */
+        /* * * * * * * * * */
+
+        /* Assembles HTTP Body byte-stream into JSON */
+        public static async Task<dynamic> GetBody (HttpRequest req) {
+            string requestBody = await new StreamReader (req.Body).ReadToEndAsync ();
+            return Newtonsoft.Json.JsonConvert.DeserializeObject (requestBody);
+        }
+
+        /* Manages database connection, runs queries, and returns results */
+        public static string ExecuteQuery (string query) {
+            try {
+                /* Defines connection parameters and query logic */
+                SqlConnection connection = new SqlConnection (System.Environment.GetEnvironmentVariable ("Connection String"));
+                SqlCommand command = new SqlCommand (query, connection);
+
+                /* Connects to database and executes query */
+                connection.Open ();
+                SqlDataReader reader = command.ExecuteReader ();
+
+                /* Holds row results as they are read */
+                List<string> results = new List<string> ();
+                while (reader.Read ()) {
+
+                    /* Dumps values into Object array */
+                    Object[] fields = new Object[reader.FieldCount];
+                    reader.GetValues (fields);
+
+                    /* Adds row result as delimiter-seperated values */
+                    results.Add (
+                        String.Join (
+                            DELIMITER,
+                            fields.Where (x => x != null)
+                            .Select (x => x.ToString ())
+                            .ToArray ()
+                        )
+                    );
+                }
+
+                /* Closes the database connection */
+                reader.Close ();
+                connection.Close ();
+
+                /* Returns formatted results from query */
+                return String.Join (
+                    NEW_LINE,
+                    results.ToArray ()
+                );
+
+            } catch (Exception ex) {
+                return String.Format(
+                    "Error({0}): {1}",
+                    query,
+                    ex.ToString()
+                );
+            }
+        }
+
+        /* Manages database connection, runs commands, and returns receipts */
+        public static string ExecuteNonQuery (string query) {
+            try {
+                /* Defines connection parameters and query logic */
+                SqlConnection connection = new SqlConnection (System.Environment.GetEnvironmentVariable ("Connection String"));
+                SqlCommand command = new SqlCommand (query, connection);
+
+                /* Connects to database and executes non-query */
+                connection.Open ();
+                int rows_modified = command.ExecuteNonQuery ();
+
+                /* Returns number of rows modified */
+                return String.Format (
+                    "Query({0}): {1} Row(s) Modified",
+                    query,
+                    rows_modified
+                );
+
+            } catch (Exception ex) {
+                return String.Format(
+                    "Error({0}): {1}",
+                    query,
+                    ex.ToString()
+                );
+            };
         }
     }
 }
