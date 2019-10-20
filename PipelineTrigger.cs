@@ -52,9 +52,7 @@ namespace BitNaughts {
         [FunctionName ("AddGalaxy")] /* API Endpoint: /api/add/planet */
         public static async Task<string> AddGalaxy ([HttpTrigger (AuthorizationLevel.Anonymous, "post", Route = "add/galaxy")] HttpRequest req, ILogger log) {
 
-            string data = "";
-            using (StreamReader reader = new StreamReader(req.Body, encoding))
-                data = await reader.ReadToEndAsync();
+            string data = await new StreamReader(req.Body).ReadToEndAsync();
             // Here you can process json into an object
             // dynamic parsed = JsonConvert.DeserializeObject(data);
 
