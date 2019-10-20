@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 using Nancy.Json;
 
 namespace BitNaughts {
-    public static class FunctionApp {
+    public static class EndpointHandler {
 
         public const string DELIMITER = ",";
         public const string NEW_LINE = "\n";
