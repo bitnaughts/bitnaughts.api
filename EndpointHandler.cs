@@ -37,6 +37,17 @@ namespace BitNaughts {
             );
         }
 
+        [FunctionName ("CreateGalaxy")] /* API Endpoint: /api/create/galaxy */
+        public static async Task<string> CreateGalaxy ([HttpTrigger (AuthorizationLevel.Anonymous, "post", Route = "create/galaxy")] HttpRequest req) {
+            dynamic req_body = await GetBody (req);
+            return ExecuteNonQuery (
+                String.Format (
+                    "INSERT INTO dbo.Galaxies VALUES ({1})", /* SQL Query to be executed */
+                    String.Join (DELIMITER, req_body.id, req_body.seed)
+                )
+            );
+        }
+
         [FunctionName ("Read")] /* API Endpoint: /api/read?table=players&fields=* */
         public static async Task<string> Read ([HttpTrigger (AuthorizationLevel.Anonymous, "get", Route = "read")] HttpRequest req) {
 
@@ -122,8 +133,8 @@ namespace BitNaughts {
                                     String.Join (
                                         DELIMITER,
                                         fields.Where (x => x != null)
-                                              .Select (x => x.ToString ())
-                                              .ToArray ()
+                                        .Select (x => x.ToString ())
+                                        .ToArray ()
                                     )
                                 );
                             }
