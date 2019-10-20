@@ -16,7 +16,7 @@ public static class QueryHandler {
     public const string ERROR_MESSAGE = "ERROR";
 
     /* Helper Function for managing database connection, running commands, and returning results */
-    public static string[] ExecuteQuery (string query) {
+    public static string ExecuteQuery (string query) {
         try {
             /* Defines connection parameters and query logic */
             SqlConnection connection = new SqlConnection (System.Environment.GetEnvironmentVariable ("Connection String"));
@@ -49,15 +49,14 @@ public static class QueryHandler {
             reader.Close ();
             connection.Close ();
 
-            /* Returns array of strings, one string per row returned from query */
-            return results.ToArray ();
+            /* Returns CSV formatted results from query */
+            return String.Join(
+                NEW_LINE,
+                results.ToArray ()
+            );
 
         } catch (Exception ex) {
-            return new string[] {
-                ERROR_MESSAGE,
-                ex.ToString (),
-                query
-            };
+            return ERROR_MESSAGE + ex.ToString () + query;
         }
     }
 
