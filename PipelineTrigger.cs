@@ -13,66 +13,21 @@ namespace BitNaughts {
 
         public const string DELIMITER = ",";
         public const string NEW_LINE = "\n";
-        public const string ERROR_MESSAGE = "ERROR";
 
-        /* Database Schema:
-         * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-         * Galaxies(g_galaxy_id, g_seed)                               *
-         * SystemLinks(sl_galaxy_id, sl_system_id)                     *
-         * Systems(s_system_id, s_seed)                                *
-         * PlanetLinks(pl_system_id, pl_planet_id)                     *
-         * Planets(p_planet_id, p_seed)                                *
-         * AsteroidLinks(al_system_id, al_asteroid_id)                 *
-         * Asteroids(a_asteroid_id, a_size, a_seed)                    *
-         * Players(py_player_id, py_name, py_password)                 *
-         * Owns(o_player_id, o_ship_id)                                *
-         * Ships(sh_ship_id, sh_name, sh_position_x, sh_position_y)    *
-         * FightAt(fa_ship_1_id, fa_ship_2_id, fa_system_id, fa_date)  *
-         * Visits(v_ship_id, v_planet_id, v_date)                      *
-         * Mines(m_ship_id, m_asteroid_id, m_amount, m_date)           *
-         * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *         
-         */
-
+        /* Assembles HTTP Body byte-stream into JSON */
         public static async Task<dynamic> GetBody (HttpRequest req) {
             string requestBody = await new StreamReader (req.Body).ReadToEndAsync ();
             return Newtonsoft.Json.JsonConvert.DeserializeObject (requestBody);
         }
-        public static string InsertIntoTable (string table, string[] values) {
-            return QueryHandler.ExecuteNonQuery (
-                /* SQL Query to be executed */
-                String.Format (
-                    "INSERT INTO dbo.{0} VALUES ({1})",
-                    table,
-                    String.Join (
-                        DELIMITER,
-                        values
-                    )
-                )
-            );
-        }
+        
+        [FunctionName ("Create")] /* API Endpoint: /api/create?table=players */
+        public static async Task<string> Create ([HttpTrigger (AuthorizationLevel.Anonymous, "post", Route = "create")] HttpRequest req, ILogger log) {
 
-        /* GET ENDPOINT */
-        [FunctionName ("Get")] /* API Endpoint: /api/get?Table=players */
-        public static async Task<string> Get ([HttpTrigger (AuthorizationLevel.Anonymous, "get", Route = "get")] HttpRequest req, ILogger log) {
-
-            /* Returning CSV formatted result of query */
-            return QueryHandler.ExecuteQuery (
-                String.Format (
-                    "SELECT * FROM dbo.{0}", /* SQL Query to be executed */
-                    req.Query["table"]
-                )
-            );
-        }
-
-        /* ADD ENDPOINT */
-        [FunctionName ("Add")] /* API Endpoint: /api/add?Table=players */
-        public static async Task<string> Add ([HttpTrigger (AuthorizationLevel.Anonymous, "post", Route = "add")] HttpRequest req, ILogger log) {
-
-            /* Reading data into table and returning transaction receipt */
+            /* Reads data into table and returns transaction receipt */
             dynamic req_body = await GetBody (req);
             return QueryHandler.ExecuteNonQuery (
                 String.Format (
-                    "INSERT INTO dbo.{0} VALUES ({1})", /* SQL Query to be executed */
+                    "INSERT INTO {0} VALUES ({1})", /* SQL Query to be executed */
                     req.Query["table"],
                     String.Join (
                         DELIMITER,
@@ -82,18 +37,49 @@ namespace BitNaughts {
             );
         }
 
-        [FunctionName ("Testing")] /* API Endpoint: /api/Testing?q=query */
-        public static async Task<string> Testing ([HttpTrigger (AuthorizationLevel.Anonymous, "get", Route = "Testing")] HttpRequest req, ILogger log) {
+        [FunctionName ("Read")] /* API Endpoint: /api/read?table=players&fields=* */
+        public static async Task<string> Read ([HttpTrigger (AuthorizationLevel.Anonymous, "get", Route = "read")] HttpRequest req, ILogger log) {
 
-            /* Returning result of query */
-            return String.Join (
-                NEW_LINE,
-                QueryHandler.ExecuteQuery (
-                    /* SQL Query to be executed */
-                    req.Query["q"]
+            /* Returns CSV formatted result of selection query */
+            return QueryHandler.ExecuteQuery (
+                String.Format (
+                    "SELECT {1} FROM {0}", /* SQL Query to be executed */
+                    req.Query["table"],
+                    req.Query["fields"]
                 )
             );
         }
 
+        [FunctionName ("Update")] /* API Endpoint: /api/update?table=players */
+        public static async Task<string> Update ([HttpTrigger (AuthorizationLevel.Anonymous, "put", Route = "update")] HttpRequest req, ILogger log) {
+
+            /* Overrides data in table and returns transaction receipt */
+            dynamic req_body = await GetBody (req);
+            return QueryHandler.ExecuteNonQuery (
+                String.Format (
+                    "UPDATE {0} SET {1} WHERE {2}", /* SQL Query to be executed */
+                    req.Query["table"],
+                    String.Join (
+                        DELIMITER,
+                        req_body.values.ToObject<string[]> ()
+                    ),
+                    req_body.condition
+                )
+            );
+        }
+
+        [FunctionName ("Delete")] /* API Endpoint: /api/delete?table=players */
+        public static async Task<string> Delete ([HttpTrigger (AuthorizationLevel.Anonymous, "delete", Route = "delete")] HttpRequest req, ILogger log) {
+
+            /* Removes data in table and returns transaction receipt */
+            dynamic req_body = await GetBody (req);
+            return QueryHandler.ExecuteQuery (
+                String.Format (
+                    "DELETE FROM {0} WHERE {1}", /* SQL Query to be executed */
+                    req.Query["table"],
+                    req_body.condition
+                )
+            );
+        }
     }
 }

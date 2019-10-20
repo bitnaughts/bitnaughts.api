@@ -13,7 +13,6 @@ public static class QueryHandler {
 
     public const string DELIMITER = ",";
     public const string NEW_LINE = "\n";
-    public const string ERROR_MESSAGE = "ERROR";
 
     /* Helper Function for managing database connection, running commands, and returning results */
     public static string ExecuteQuery (string query) {
@@ -56,7 +55,7 @@ public static class QueryHandler {
             );
 
         } catch (Exception ex) {
-            return ERROR_MESSAGE + ex.ToString () + query;
+            return ex.ToString () + query;
         }
     }
 
@@ -78,7 +77,7 @@ public static class QueryHandler {
             );
 
         } catch (Exception ex) {
-            return ERROR_MESSAGE + ex.ToString () + query;
+            return ex.ToString () + query;
         };
     }
 }
