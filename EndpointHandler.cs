@@ -42,7 +42,7 @@ namespace BitNaughts {
             dynamic req_body = await GetBody (req);
             return ExecuteNonQuery (
                 String.Format (
-                    "INSERT INTO dbo.Galaxies VALUES ({1})", /* SQL Query to be executed */
+                    "INSERT INTO dbo.Galaxies VALUES ({0})", /* SQL Query to be executed */
                     String.Join (DELIMITER, req_body.id, req_body.seed)
                 )
             );
