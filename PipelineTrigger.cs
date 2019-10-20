@@ -53,14 +53,14 @@ namespace BitNaughts {
         public static async Task<string> AddGalaxy ([HttpTrigger (AuthorizationLevel.Anonymous, "post", Route = "add/galaxy")] HttpRequest req, ILogger log) {
 
             /* Returning result of query */
-            return String.Join (
+            return req.Query["id"] + req.Query["seed"] + String.Join (
                 NEW_LINE,
                 QueryHandler.ExecuteNonQuery (
                     /* SQL Query to be executed */
                     String.Format (
                         "INSERT INTO dbo.Galaxies VALUES ({0}, {1})",
-                        req["id"],
-                        req["seed"]
+                        req.Query["id"],
+                        req.Query["seed"]
                     )
                 )
             );
@@ -76,8 +76,8 @@ namespace BitNaughts {
                     /* SQL Query to be executed */
                     String.Format (
                         "INSERT INTO dbo.Systems VALUES ({0}, {1})",
-                        req["id"],
-                        req["seed"]
+                        req.Query["id"],
+                        req.Query["seed"]
                     )
                 )
             );
@@ -93,8 +93,8 @@ namespace BitNaughts {
                     /* SQL Query to be executed */
                     String.Format (
                         "INSERT INTO dbo.Planets VALUES ({0}, {1})",
-                        req["id"],
-                        req["seed"]
+                        req.Query["id"],
+                        req.Query["seed"]
                     )
                 )
             );
@@ -110,8 +110,8 @@ namespace BitNaughts {
                     /* SQL Query to be executed */
                     String.Format (
                         "INSERT INTO dbo.Asteroids VALUES ({0}, {1}, {2})",
-                        req["id"],
-                        req["seed"],
+                        req.Query["id"],
+                        req.Query["seed"],
                         100
                     )
                 )
@@ -128,8 +128,8 @@ namespace BitNaughts {
                     /* SQL Query to be executed */
                     String.Format (
                         "INSERT INTO dbo.Ships VALUES ({0}, {1}, {2}, {3})",
-                        req["id"],
-                        req["seed"],
+                        req.Query["id"],
+                        req.Query["seed"],
                         0,
                         0
                     )
@@ -145,7 +145,7 @@ namespace BitNaughts {
                 NEW_LINE,
                 QueryHandler.ExecuteQuery (
                     /* SQL Query to be executed */
-                    req["q"]
+                    req.Query["q"]
                 )
             );
         }
