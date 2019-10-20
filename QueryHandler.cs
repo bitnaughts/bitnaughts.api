@@ -29,7 +29,7 @@ public static class QueryHandler {
             /* Holds row results as they are read */
             List<string> results = new List<string> ();
             while (reader.Read ()) {
-                
+
                 /* Dumps values into Object array */
                 Object[] fields = new Object[reader.FieldCount];
                 reader.GetValues (fields);
@@ -62,7 +62,7 @@ public static class QueryHandler {
     }
 
     /* Helper Function for managing database connection, running commands, and returning results */
-    public static string[] ExecuteNonQuery (string query) {
+    public static string ExecuteNonQuery (string query) {
         try {
             /* Defines connection parameters and query logic */
             SqlConnection connection = new SqlConnection (System.Environment.GetEnvironmentVariable ("Connection String"));
@@ -73,19 +73,13 @@ public static class QueryHandler {
             int rows_modified = command.ExecuteNonQuery ();
 
             /* Returns number of rows modified */
-            return new string[] {
-                String.Format (
-                    "{0} Rows Modified",
-                    rows_modified
-                )
-            };
+            return String.Format (
+                "{0} Rows Modified",
+                rows_modified
+            );
 
         } catch (Exception ex) {
-            return new string[] {
-                ERROR_MESSAGE,
-                ex.ToString (),
-                query
-            };
-        }
+            return ERROR_MESSAGE + ex.ToString () + query;
+        };
     }
 }

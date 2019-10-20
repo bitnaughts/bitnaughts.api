@@ -1,13 +1,12 @@
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
+using Nancy.Json;
 
 namespace BitNaughts {
     public static class FunctionApp {
@@ -34,6 +33,24 @@ namespace BitNaughts {
          * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *         
          */
 
+        public static async Task<dynamic> GetBody (HttpRequest req) {
+            string requestBody = await new StreamReader (req.Body).ReadToEndAsync ();
+            return Newtonsoft.Json.JsonConvert.DeserializeObject (requestBody);
+        }
+        public static string InsertIntoTable (string table, string[] values) {
+            return QueryHandler.ExecuteNonQuery (
+                /* SQL Query to be executed */
+                String.Format (
+                    "INSERT INTO dbo.{0} VALUES ({1})",
+                    table,
+                    String.Join (
+                        DELIMITER,
+                        values
+                    )
+                )
+            );
+        }
+
         /* GET ENDPOINTS */
         [FunctionName ("GetPlayers")] /* API Endpoint: /api/get/players */
         public static async Task<string> GetPlayers ([HttpTrigger (AuthorizationLevel.Anonymous, "get", Route = "get/players")] HttpRequest req, ILogger log) {
@@ -51,94 +68,47 @@ namespace BitNaughts {
         /* ADD ENDPOINTS */
         [FunctionName ("AddGalaxy")] /* API Endpoint: /api/add/planet */
         public static async Task<string> AddGalaxy ([HttpTrigger (AuthorizationLevel.Anonymous, "post", Route = "add/galaxy")] HttpRequest req, ILogger log) {
-
-            string data = await new StreamReader(req.Body).ReadToEndAsync();
-            // Here you can process json into an object
-            // dynamic parsed = JsonConvert.DeserializeObject(data);
-
-            /* Returning result of query */
-            return data + req.Query["id"] + req.Query["seed"] + String.Join (
-                NEW_LINE,
-                QueryHandler.ExecuteNonQuery (
-                    /* SQL Query to be executed */
-                    String.Format (
-                        "INSERT INTO dbo.Galaxies VALUES ({0}, {1})",
-                        req.Query["id"],
-                        req.Query["seed"]
-                    )
-                )
-            );
+            /* Reading message body and returning result of query */
+            dynamic data = await GetBody (req);
+            return InsertIntoTable ("Galaxies", new string[] {
+                data.id, data.seed
+            });
         }
 
         [FunctionName ("AddSystem")] /* API Endpoint: /api/add/planet */
         public static async Task<string> AddSystem ([HttpTrigger (AuthorizationLevel.Anonymous, "post", Route = "add/system")] HttpRequest req, ILogger log) {
-
-            /* Returning result of query */
-            return String.Join (
-                NEW_LINE,
-                QueryHandler.ExecuteNonQuery (
-                    /* SQL Query to be executed */
-                    String.Format (
-                        "INSERT INTO dbo.Systems VALUES ({0}, {1})",
-                        req.Query["id"],
-                        req.Query["seed"]
-                    )
-                )
-            );
+            /* Reading message body and returning result of query */
+            dynamic data = await GetBody (req);
+            return InsertIntoTable ("Systems", new string[] {
+                data.id, data.seed
+            });
         }
 
         [FunctionName ("AddPlanet")] /* API Endpoint: /api/add/planet */
         public static async Task<string> AddPlanet ([HttpTrigger (AuthorizationLevel.Anonymous, "post", Route = "add/planet")] HttpRequest req, ILogger log) {
-
-            /* Returning result of query */
-            return String.Join (
-                NEW_LINE,
-                QueryHandler.ExecuteNonQuery (
-                    /* SQL Query to be executed */
-                    String.Format (
-                        "INSERT INTO dbo.Planets VALUES ({0}, {1})",
-                        req.Query["id"],
-                        req.Query["seed"]
-                    )
-                )
-            );
+            /* Reading message body and returning result of query */
+            dynamic data = await GetBody (req);
+            return InsertIntoTable ("Planets", new string[] {
+                data.id, data.seed
+            });
         }
 
         [FunctionName ("AddAsteroid")] /* API Endpoint: /api/add/asteroid */
         public static async Task<string> AddAsteroid ([HttpTrigger (AuthorizationLevel.Anonymous, "post", Route = "add/asteroid")] HttpRequest req, ILogger log) {
-
-            /* Returning result of query */
-            return String.Join (
-                NEW_LINE,
-                QueryHandler.ExecuteNonQuery (
-                    /* SQL Query to be executed */
-                    String.Format (
-                        "INSERT INTO dbo.Asteroids VALUES ({0}, {1}, {2})",
-                        req.Query["id"],
-                        req.Query["seed"],
-                        100
-                    )
-                )
-            );
+            /* Reading message body and returning result of query */
+            dynamic data = await GetBody (req);
+            return InsertIntoTable ("Asteroids", new string[] {
+                data.id, data.seed, data.size
+            });
         }
 
         [FunctionName ("AddShip")] /* API Endpoint: /api/add/ship */
         public static async Task<string> AddShip ([HttpTrigger (AuthorizationLevel.Anonymous, "post", Route = "add/ship")] HttpRequest req, ILogger log) {
-
-            /* Returning result of query */
-            return String.Join (
-                NEW_LINE,
-                QueryHandler.ExecuteNonQuery (
-                    /* SQL Query to be executed */
-                    String.Format (
-                        "INSERT INTO dbo.Ships VALUES ({0}, {1}, {2}, {3})",
-                        req.Query["id"],
-                        req.Query["seed"],
-                        0,
-                        0
-                    )
-                )
-            );
+            /* Reading message body and returning result of query */
+            dynamic data = await GetBody (req);
+            return InsertIntoTable ("Ship", new string[] {
+                data.id, data.seed, data.position_x, data.position_y
+            });
         }
 
         [FunctionName ("Testing")] /* API Endpoint: /api/Testing?q=query */
