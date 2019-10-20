@@ -59,8 +59,8 @@ namespace BitNaughts {
                     /* SQL Query to be executed */
                     String.Format (
                         "INSERT INTO dbo.Galaxies VALUES ({0}, {1})",
-                        req.Query["id"],
-                        req.Query["seed"]
+                        req["id"],
+                        req["seed"]
                     )
                 )
             );
@@ -76,8 +76,8 @@ namespace BitNaughts {
                     /* SQL Query to be executed */
                     String.Format (
                         "INSERT INTO dbo.Systems VALUES ({0}, {1})",
-                        req.Query["id"],
-                        req.Query["seed"]
+                        req["id"],
+                        req["seed"]
                     )
                 )
             );
@@ -93,8 +93,8 @@ namespace BitNaughts {
                     /* SQL Query to be executed */
                     String.Format (
                         "INSERT INTO dbo.Planets VALUES ({0}, {1})",
-                        req.Query["id"],
-                        req.Query["seed"]
+                        req["id"],
+                        req["seed"]
                     )
                 )
             );
@@ -110,8 +110,8 @@ namespace BitNaughts {
                     /* SQL Query to be executed */
                     String.Format (
                         "INSERT INTO dbo.Asteroids VALUES ({0}, {1}, {2})",
-                        req.Query["id"],
-                        req.Query["seed"],
+                        req["id"],
+                        req["seed"],
                         100
                     )
                 )
@@ -128,8 +128,8 @@ namespace BitNaughts {
                     /* SQL Query to be executed */
                     String.Format (
                         "INSERT INTO dbo.Ships VALUES ({0}, {1}, {2}, {3})",
-                        req.Query["id"],
-                        req.Query["seed"],
+                        req["id"],
+                        req["seed"],
                         0,
                         0
                     )
@@ -145,7 +145,7 @@ namespace BitNaughts {
                 NEW_LINE,
                 QueryHandler.ExecuteQuery (
                     /* SQL Query to be executed */
-                    req.Query["q"]
+                    req["q"]
                 )
             );
         }
