@@ -50,7 +50,7 @@ namespace BitNaughts {
 
         /* ADD ENDPOINTS */
         [FunctionName ("AddGalaxy")] /* API Endpoint: /api/add/planet */
-        public static async Task<string> AddGalaxy ([HttpTrigger (AuthorizationLevel.Anonymous, "get", Route = "add/galaxy")] HttpRequest req, ILogger log) {
+        public static async Task<string> AddGalaxy ([HttpTrigger (AuthorizationLevel.Anonymous, "post", Route = "add/galaxy")] HttpRequest req, ILogger log) {
 
             /* Returning result of query */
             return String.Join (
@@ -58,7 +58,7 @@ namespace BitNaughts {
                 QueryHandler.ExecuteNonQuery (
                     /* SQL Query to be executed */
                     String.Format (
-                        "INSERT INTO dbo.Galaxy VALUES ({0}, {1})",
+                        "INSERT INTO dbo.Galaxies VALUES ({0}, {1})",
                         req.Query["id"],
                         req.Query["seed"]
                     )
@@ -67,7 +67,7 @@ namespace BitNaughts {
         }
 
         [FunctionName ("AddSystem")] /* API Endpoint: /api/add/planet */
-        public static async Task<string> AddSystem ([HttpTrigger (AuthorizationLevel.Anonymous, "get", Route = "add/system")] HttpRequest req, ILogger log) {
+        public static async Task<string> AddSystem ([HttpTrigger (AuthorizationLevel.Anonymous, "post", Route = "add/system")] HttpRequest req, ILogger log) {
 
             /* Returning result of query */
             return String.Join (
@@ -84,7 +84,7 @@ namespace BitNaughts {
         }
 
         [FunctionName ("AddPlanet")] /* API Endpoint: /api/add/planet */
-        public static async Task<string> AddPlanet ([HttpTrigger (AuthorizationLevel.Anonymous, "get", Route = "add/planet")] HttpRequest req, ILogger log) {
+        public static async Task<string> AddPlanet ([HttpTrigger (AuthorizationLevel.Anonymous, "post", Route = "add/planet")] HttpRequest req, ILogger log) {
 
             /* Returning result of query */
             return String.Join (
@@ -101,7 +101,7 @@ namespace BitNaughts {
         }
 
         [FunctionName ("AddAsteroid")] /* API Endpoint: /api/add/asteroid */
-        public static async Task<string> AddAsteroid ([HttpTrigger (AuthorizationLevel.Anonymous, "get", Route = "add/asteroid")] HttpRequest req, ILogger log) {
+        public static async Task<string> AddAsteroid ([HttpTrigger (AuthorizationLevel.Anonymous, "post", Route = "add/asteroid")] HttpRequest req, ILogger log) {
 
             /* Returning result of query */
             return String.Join (
@@ -119,7 +119,7 @@ namespace BitNaughts {
         }
 
         [FunctionName ("AddShip")] /* API Endpoint: /api/add/ship */
-        public static async Task<string> AddShip ([HttpTrigger (AuthorizationLevel.Anonymous, "get", Route = "add/ship")] HttpRequest req, ILogger log) {
+        public static async Task<string> AddShip ([HttpTrigger (AuthorizationLevel.Anonymous, "post", Route = "add/ship")] HttpRequest req, ILogger log) {
 
             /* Returning result of query */
             return String.Join (
