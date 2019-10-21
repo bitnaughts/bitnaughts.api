@@ -19,7 +19,7 @@ namespace BitNaughts {
         /* Endpoint Functions */
         /* * * * * * * * * * */
 
-        [FunctionName ("Create")] /* API Endpoint: /api/create?flag=add&table=players */
+        [FunctionName ("Create")] /* API Endpoints: /api/create?flag=reset, /api/create?flag=add&table=players */
         public static async Task<string> Create ([HttpTrigger (AuthorizationLevel.Anonymous, "post", Route = "create")] HttpRequest req) {
 
             /* Reads data into table and returns transaction receipt */
@@ -117,7 +117,7 @@ namespace BitNaughts {
                             "INSERT INTO dbo.PlanetLinks " + String.Join (DELIMITER, planet_link_values.ToArray ()),
                             "INSERT INTO dbo.AsteroidLinks " + String.Join (DELIMITER, asteroid_link_values.ToArray ())
                         }
-                    )
+                    );
                     // return ExecuteNonQuery (
                     //     new string[] {
                     //         /* Cleaning Entity Tables */
