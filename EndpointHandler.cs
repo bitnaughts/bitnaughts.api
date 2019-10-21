@@ -19,39 +19,145 @@ namespace BitNaughts {
         /* Endpoint Functions */
         /* * * * * * * * * * */
 
-        [FunctionName ("Create")] /* API Endpoint: /api/create?table=players */
+        [FunctionName ("Create")] /* API Endpoint: /api/create?flag=add&table=players */
         public static async Task<string> Create ([HttpTrigger (AuthorizationLevel.Anonymous, "post", Route = "create")] HttpRequest req) {
 
             /* Reads data into table and returns transaction receipt */
-            Dictionary<string,string> req_body_dict = await GetBodyAsDict (req);
-            return ExecuteNonQuery (
-                String.Format (
-                    "INSERT INTO dbo.{0} VALUES ({1})", /* SQL Query to be executed */
-                    req.Query["table"],
-                    String.Join (
-                        DELIMITER,
-                        req_body_dict.Select (param => param.Value)
-                    )
-                )
-            );
-        }
+            switch (req.Query["flag"]) {
+                case "reset":
 
-        // [FunctionName ("CreateGalaxy")] /* API Endpoint: /api/create/galaxy */
-        // public static async Task<string> CreateGalaxy ([HttpTrigger (AuthorizationLevel.Anonymous, "post", Route = "create/galaxy")] HttpRequest req) {
-        //     dynamic req_body = await GetBody (req);
-        //     return ExecuteNonQuery (
-        //         String.Format (
-        //             "INSERT INTO dbo.Galaxies VALUES ({0})", /* SQL Query to be executed */
-        //             String.Join (DELIMITER, req_body.id, req_body.seed)
-        //         )
-        //     );
-        // }
+                    /* Pulls galaxy JSON from HTTP Body */
+                    dynamic galaxy_json = await GetBody (req.Body);
+
+                    /* JSON Enumerable */
+                    IEnumerable<dynamic> json;
+
+                    /* Entity Table Values */
+                    string galaxy_values = "";
+                    List<string> system_values = new List<string> ();
+                    List<string> planet_values = new List<string> ();
+                    List<string> asteroid_values = new List<string> ();
+
+                    /* Relation Table Values */
+                    List<string> system_link_values = new List<string> ();
+                    List<string> planet_link_values = new List<string> ();
+                    List<string> asteroid_link_values = new List<string> ();
+
+                    /* Agregrates Table Values */
+                    galaxy_values = WrapValues (new string[] {
+                        galaxy_json.id, galaxy_json.seed
+                    });
+                    
+                    json = galaxy_json["systems"];
+                    system_values.Add (String.Join (DELIMITER, json.Select (
+                        system => WrapValues (new string[] {
+                            system.id, system.seed, system.position_x, system.position_y
+                        })
+                    )));
+                    foreach (dynamic system in galaxy_json["systems"]) {
+                        
+                        json = system["connected_systems"];
+                        system_link_values.Add (
+                            String.Join (DELIMITER, json.Select (
+                                connected_system => WrapValues (new string[] {
+                                    galaxy_json.id, system.id, connected_system.id
+                                })
+                            ))
+                        );
+                        
+                        json = system["planets"];
+                        planet_values.Add (String.Join (DELIMITER, json.Select (
+                            planet => WrapValues (new string[] {
+                                planet.id, planet.seed
+                            })
+                        )));
+                        planet_link_values.Add (
+                            String.Join (DELIMITER, json.Select (
+                                planet => WrapValues (new string[] {
+                                    system.id, planet.id
+                                })
+                            ))
+                        );
+                        
+                        json = system["asteroids"];
+                        asteroid_values.Add (
+                            String.Join (DELIMITER, json.Select (
+                                asteroid => WrapValues (new string[] {
+                                    asteroid.id, asteroid.seed, asteroid.size
+                                })
+                            ))
+                        );
+                        asteroid_link_values.Add (
+                            String.Join (DELIMITER, json.Select (
+                                asteroid => WrapValues (new string[] {
+                                    system.id, asteroid.id
+                                })
+                            ))
+                        );
+                    }
+
+                    /* Wipes tables and injects new values */
+                    return String.Join("\n", new string[] {
+                            /* Cleaning Entity Tables */
+                            "DELETE FROM dbo.Galaxies",
+                            "DELETE FROM dbo.Systems",
+                            "DELETE FROM dbo.Planets",
+                            "DELETE FROM dbo.Asteroids",
+                            /* Cleaning Relation Tables */
+                            "DELETE FROM dbo.SystemLinks",
+                            "DELETE FROM dbo.PlanetLinks",
+                            "DELETE FROM dbo.AsteroidLinks",
+                            /* Populating Entity Tables */
+                            "INSERT INTO dbo.Galaxies " + galaxy_values,
+                            "INSERT INTO dbo.Systems " + String.Join (DELIMITER, system_values.ToArray ()),
+                            "INSERT INTO dbo.Planets " + String.Join (DELIMITER, planet_values.ToArray ()),
+                            "INSERT INTO dbo.Asteroids " + String.Join (DELIMITER, asteroid_values.ToArray ()),
+                            /* Populating Relation Tables */
+                            "INSERT INTO dbo.SystemLinks " + String.Join (DELIMITER, system_link_values.ToArray ()),
+                            "INSERT INTO dbo.PlanetLinks " + String.Join (DELIMITER, planet_link_values.ToArray ()),
+                            "INSERT INTO dbo.AsteroidLinks " + String.Join (DELIMITER, asteroid_link_values.ToArray ())
+                        }
+                    )
+                    // return ExecuteNonQuery (
+                    //     new string[] {
+                    //         /* Cleaning Entity Tables */
+                    //         "DELETE FROM dbo.Galaxies",
+                    //         "DELETE FROM dbo.Systems",
+                    //         "DELETE FROM dbo.Planets",
+                    //         "DELETE FROM dbo.Asteroids",
+                    //         /* Cleaning Relation Tables */
+                    //         "DELETE FROM dbo.SystemLinks",
+                    //         "DELETE FROM dbo.PlanetLinks",
+                    //         "DELETE FROM dbo.AsteroidLinks",
+                    //         /* Populating Entity Tables */
+                    //         "INSERT INTO dbo.Galaxies " + galaxy_values,
+                    //         "INSERT INTO dbo.Systems " + String.Join (DELIMITER, system_values.ToArray ()),
+                    //         "INSERT INTO dbo.Planets " + String.Join (DELIMITER, planet_values.ToArray ()),
+                    //         "INSERT INTO dbo.Asteroids " + String.Join (DELIMITER, asteroid_values.ToArray ()),
+                    //         /* Populating Relation Tables */
+                    //         "INSERT INTO dbo.SystemLinks " + String.Join (DELIMITER, system_link_values.ToArray ()),
+                    //         "INSERT INTO dbo.PlanetLinks " + String.Join (DELIMITER, planet_link_values.ToArray ()),
+                    //         "INSERT INTO dbo.AsteroidLinks " + String.Join (DELIMITER, asteroid_link_values.ToArray ())
+                    //     }
+                    // );
+                case "add":
+                    // return ExecuteNonQuery (
+                    //     String.Format(
+                    //         "INSERT INTO dbo.{0} {1}",
+                    //         req.Query["table"],
+
+                    //     )
+                    // )
+                    return "";
+            }
+            return "Flag not set...";
+        }
 
         [FunctionName ("Read")] /* API Endpoint: /api/read?table=players&fields=* */
         public static async Task<string> Read ([HttpTrigger (AuthorizationLevel.Anonymous, "get", Route = "read")] HttpRequest req) {
 
             /* Returns formatted result of selection query */
-            dynamic req_body = await GetBody (req);
+            dynamic req_body = await GetBody (req.Body);
             return ExecuteQuery (
                 String.Format (
                     "SELECT {1} FROM dbo.{0} WHERE {2}", /* SQL Query to be executed */
@@ -69,7 +175,7 @@ namespace BitNaughts {
         public static async Task<string> Update ([HttpTrigger (AuthorizationLevel.Anonymous, "put", Route = "update")] HttpRequest req) {
 
             /* Overrides data in table and returns transaction receipt */
-            dynamic req_body = await GetBody (req);
+            dynamic req_body = await GetBody (req.Body);
             return ExecuteNonQuery (
                 String.Format (
                     "UPDATE dbo.{0} SET {1} WHERE {2}", /* SQL Query to be executed */
@@ -87,7 +193,7 @@ namespace BitNaughts {
         public static async Task<string> Delete ([HttpTrigger (AuthorizationLevel.Anonymous, "delete", Route = "delete")] HttpRequest req) {
 
             /* Removes data in table and returns transaction receipt */
-            dynamic req_body = await GetBody (req);
+            dynamic req_body = await GetBody (req.Body);
             return ExecuteNonQuery (
                 String.Format (
                     "DELETE FROM dbo.{0} WHERE {1}", /* SQL Query to be executed */
@@ -101,22 +207,36 @@ namespace BitNaughts {
         /* * * * * * * * * */
 
         /* Assembles HTTP Body byte-stream into JSON */
-        public static async Task<dynamic> GetBody (HttpRequest req) {
-            using (var reader = new StreamReader (req.Body)) {
+        public static async Task<dynamic> GetBody (Stream body) {
+            using (var reader = new StreamReader (body)) {
                 string body_stream = await reader.ReadToEndAsync ();
                 return Newtonsoft.Json.JsonConvert.DeserializeObject (body_stream);
             }
         }
-        
-        public static async Task<Dictionary<string,string>> GetBodyAsDict (HttpRequest req) {
+
+        public static async Task<Dictionary<string, string>> GetBodyAsDict (HttpRequest req) {
             using (var reader = new StreamReader (req.Body)) {
                 string body_stream = await reader.ReadToEndAsync ();
                 return ((IEnumerable<KeyValuePair<string, Newtonsoft.Json.Linq.JToken>>) Newtonsoft.Json.JsonConvert.DeserializeObject (body_stream))
                     .ToDictionary (param => param.Key, param => param.Value.ToString ());
             }
         }
+        public static string WrapValues (string[] values) {
+            return "Values (" + String.Join (DELIMITER, values) + ")";
+        }
+        public static IEnumerable<dynamic> GetEnum (dynamic json) {
+            IEnumerable<dynamic> enum_json = json;
+            return enum_json;
+        }
 
         /* Manages database connection, runs queries, and returns results */
+        public static string ExecuteQuery (string[] queries) {
+            string result = "";
+            foreach (string query in queries) {
+            result += ExecuteQuery (query) + "\n";
+            }
+            return result;
+        }
         public static string ExecuteQuery (string query) {
             try {
                 /* Defines connection parameters and query logic */
@@ -168,6 +288,13 @@ namespace BitNaughts {
         }
 
         /* Manages database connection, runs commands, and returns receipts */
+        public static string ExecuteNonQuery (string[] queries) {
+            string result = "";
+            foreach (string query in queries) {
+                result += ExecuteNonQuery (query) + "\n";
+            }
+            return result;
+        }
         public static string ExecuteNonQuery (string query) {
             try {
                 /* Defines connection parameters and query logic */
