@@ -5,10 +5,9 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.Extensions.Logging;
-using Nancy.Json;
 
 namespace BitNaughts {
     public static class EndpointHandler {
@@ -24,29 +23,29 @@ namespace BitNaughts {
         public static async Task<string> Create ([HttpTrigger (AuthorizationLevel.Anonymous, "post", Route = "create")] HttpRequest req) {
 
             /* Reads data into table and returns transaction receipt */
-            dynamic req_body = await GetBody (req);
+            Dictionary<string,string> req_body_dict = await GetBodyAsDict (req);
             return ExecuteNonQuery (
                 String.Format (
-                    "INSERT INTO {0} VALUES ({1})", /* SQL Query to be executed */
+                    "INSERT INTO dbo.{0} VALUES ({1})", /* SQL Query to be executed */
                     req.Query["table"],
                     String.Join (
                         DELIMITER,
-                        req_body.values.ToObject<string[]> ()
+                        req_body_dict.Select (param => param.Value)
                     )
                 )
             );
         }
 
-        [FunctionName ("CreateGalaxy")] /* API Endpoint: /api/create/galaxy */
-        public static async Task<string> CreateGalaxy ([HttpTrigger (AuthorizationLevel.Anonymous, "post", Route = "create/galaxy")] HttpRequest req) {
-            dynamic req_body = await GetBody (req);
-            return ExecuteNonQuery (
-                String.Format (
-                    "INSERT INTO dbo.Galaxies VALUES ({0})", /* SQL Query to be executed */
-                    String.Join (DELIMITER, req_body.id, req_body.seed)
-                )
-            );
-        }
+        // [FunctionName ("CreateGalaxy")] /* API Endpoint: /api/create/galaxy */
+        // public static async Task<string> CreateGalaxy ([HttpTrigger (AuthorizationLevel.Anonymous, "post", Route = "create/galaxy")] HttpRequest req) {
+        //     dynamic req_body = await GetBody (req);
+        //     return ExecuteNonQuery (
+        //         String.Format (
+        //             "INSERT INTO dbo.Galaxies VALUES ({0})", /* SQL Query to be executed */
+        //             String.Join (DELIMITER, req_body.id, req_body.seed)
+        //         )
+        //     );
+        // }
 
         [FunctionName ("Read")] /* API Endpoint: /api/read?table=players&fields=* */
         public static async Task<string> Read ([HttpTrigger (AuthorizationLevel.Anonymous, "get", Route = "read")] HttpRequest req) {
@@ -55,7 +54,7 @@ namespace BitNaughts {
             dynamic req_body = await GetBody (req);
             return ExecuteQuery (
                 String.Format (
-                    "SELECT {1} FROM {0} WHERE {2}", /* SQL Query to be executed */
+                    "SELECT {1} FROM dbo.{0} WHERE {2}", /* SQL Query to be executed */
                     req.Query["table"],
                     String.Join (
                         DELIMITER,
@@ -73,7 +72,7 @@ namespace BitNaughts {
             dynamic req_body = await GetBody (req);
             return ExecuteNonQuery (
                 String.Format (
-                    "UPDATE {0} SET {1} WHERE {2}", /* SQL Query to be executed */
+                    "UPDATE dbo.{0} SET {1} WHERE {2}", /* SQL Query to be executed */
                     req.Query["table"],
                     String.Join (
                         DELIMITER,
@@ -91,7 +90,7 @@ namespace BitNaughts {
             dynamic req_body = await GetBody (req);
             return ExecuteNonQuery (
                 String.Format (
-                    "DELETE FROM {0} WHERE {1}", /* SQL Query to be executed */
+                    "DELETE FROM dbo.{0} WHERE {1}", /* SQL Query to be executed */
                     req.Query["table"],
                     req_body.condition
                 )
@@ -106,6 +105,14 @@ namespace BitNaughts {
             using (var reader = new StreamReader (req.Body)) {
                 string body_stream = await reader.ReadToEndAsync ();
                 return Newtonsoft.Json.JsonConvert.DeserializeObject (body_stream);
+            }
+        }
+        
+        public static async Task<Dictionary<string,string>> GetBodyAsDict (HttpRequest req) {
+            using (var reader = new StreamReader (req.Body)) {
+                string body_stream = await reader.ReadToEndAsync ();
+                return ((IEnumerable<KeyValuePair<string, Newtonsoft.Json.Linq.JToken>>) Newtonsoft.Json.JsonConvert.DeserializeObject (body_stream))
+                    .ToDictionary (param => param.Key, param => param.Value.ToString ());
             }
         }
 
