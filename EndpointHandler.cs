@@ -26,7 +26,7 @@ namespace BitNaughts {
                     case "reset":
 
                         /* Pulls galaxy JSON from HTTP Body */
-                        dynamic galaxy_json = await GetBody (req.Body);
+                        dynamic galaxy = await GetBody (req.Body);
 
                         /* Entity Table Values */
                         string galaxy_values = "";
@@ -35,23 +35,29 @@ namespace BitNaughts {
                         List<string> asteroid_values = new List<string> ();
 
                         /* Relation Table Values */
-                        List<string> system_link_values = new List<string> ();
+                        string system_link_values = "";
+                        List<string> system_connection_values = new List<string> ();
                         List<string> planet_link_values = new List<string> ();
                         List<string> asteroid_link_values = new List<string> ();
 
                         /* Agregrates Table Values */
                         galaxy_values = WrapValues (new string[] {
-                            galaxy_json.id, galaxy_json.seed
+                            galaxy.id, galaxy.seed
                         });
-                        system_values = String.Join (DELIMITER, ((IEnumerable<dynamic>) galaxy_json.systems).Select (
+                        system_values = String.Join (DELIMITER, ((IEnumerable<dynamic>) galaxy.systems).Select (
                             system => WrapValues (new string[] {
                                 system.id, system.seed, system.position_x, system.position_y
                             })
                         ));
-                        foreach (dynamic system in galaxy_json.systems) {
-                            system_link_values.Add (String.Join (DELIMITER, ((IEnumerable<dynamic>) system.connected_systems).Select (
+                        system_link_values = String.Join (DELIMITER, ((IEnumerable<dynamic>) galaxy.systems).Select (
+                            system => WrapValues (new string[] {
+                                galaxy.id, system.id
+                            })
+                        ));
+                        foreach (dynamic system in galaxy.systems) {
+                            system_connection_values.Add (String.Join (DELIMITER, ((IEnumerable<dynamic>) system.connected_systems).Select (
                                 connected_system => WrapValues (new string[] {
-                                    galaxy_json.id, system.id, connected_system
+                                    galaxy.id, system.id, connected_system
                                 })
                             )));
                             planet_values.Add (String.Join (DELIMITER, ((IEnumerable<dynamic>) system.planets).Select (
@@ -85,18 +91,20 @@ namespace BitNaughts {
                                 "DELETE FROM dbo.Planets",
                                 "DELETE FROM dbo.Asteroids",
                                 /* Cleaning Relation Tables */
-                                // "DELETE FROM dbo.SystemLinks",
-                                // "DELETE FROM dbo.PlanetLinks",
-                                // "DELETE FROM dbo.AsteroidLinks",
+                                "DELETE FROM dbo.SystemConnections",
+                                "DELETE FROM dbo.SystemLinks",
+                                "DELETE FROM dbo.PlanetLinks",
+                                "DELETE FROM dbo.AsteroidLinks",
                                 /* Populating Entity Tables */
                                 "INSERT INTO dbo.Galaxies VALUES" + galaxy_values,
                                 "INSERT INTO dbo.Systems VALUES" + system_values,
                                 "INSERT INTO dbo.Planets VALUES" + String.Join (DELIMITER, planet_values.ToArray ()),
-                                "INSERT INTO dbo.Asteroids VALUES" + String.Join (DELIMITER, asteroid_values.ToArray ())//,
+                                "INSERT INTO dbo.Asteroids VALUES" + String.Join (DELIMITER, asteroid_values.ToArray ()),
                                 /* Populating Relation Tables */
-                                // "INSERT INTO dbo.SystemLinks VALUES" + String.Join (DELIMITER, system_link_values.ToArray ()),
-                                // "INSERT INTO dbo.PlanetLinks VALUES" + String.Join (DELIMITER, planet_link_values.ToArray ()),
-                                // "INSERT INTO dbo.AsteroidLinks VALUES" + String.Join (DELIMITER, asteroid_link_values.ToArray ())
+                                "INSERT INTO dbo.SystemConnections VALUES" + system_connection_values,
+                                "INSERT INTO dbo.SystemLinks VALUES" + String.Join (DELIMITER, system_link_values.ToArray ()),
+                                "INSERT INTO dbo.PlanetLinks VALUES" + String.Join (DELIMITER, planet_link_values.ToArray ()),
+                                "INSERT INTO dbo.AsteroidLinks VALUES" + String.Join (DELIMITER, asteroid_link_values.ToArray ())
                             }
                         );
                     case "add":
