@@ -51,39 +51,31 @@ namespace BitNaughts {
                         ));
 
                         foreach (dynamic system in galaxy_json.systems) {
-                            system_link_values.Add (
-                                String.Join (DELIMITER, ((IEnumerable<dynamic>) system.connected_systems).Select (
-                                    connected_system => WrapValues (new string[] {
-                                        galaxy_json.id, system.id, connected_system
-                                    })
-                                ))
-                            );
+                            system_link_values.Add (String.Join (DELIMITER, ((IEnumerable<dynamic>) system.connected_systems).Select (
+                                connected_system => WrapValues (new string[] {
+                                    galaxy_json.id, system.id, connected_system
+                                })
+                            )));
                             planet_values.Add (String.Join (DELIMITER, ((IEnumerable<dynamic>) system.planets).Select (
                                 planet => WrapValues (new string[] {
                                     planet.id, planet.seed
                                 })
                             )));
-                            planet_link_values.Add (
-                                String.Join (DELIMITER, ((IEnumerable<dynamic>) system.planets).Select (
-                                    planet => WrapValues (new string[] {
-                                        system.id, planet.id
-                                    })
-                                ))
-                            );
-                            asteroid_values.Add (
-                                String.Join (DELIMITER, ((IEnumerable<dynamic>) system.asteroids).Select (
-                                    asteroid => WrapValues (new string[] {
-                                        asteroid.id, asteroid.seed, asteroid.size
-                                    })
-                                ))
-                            );
-                            asteroid_link_values.Add (
-                                String.Join (DELIMITER, ((IEnumerable<dynamic>) system.planeasteroidsts).Select (
-                                    asteroid => WrapValues (new string[] {
-                                        system.id, asteroid.id
-                                    })
-                                ))
-                            );
+                            planet_link_values.Add (String.Join (DELIMITER, ((IEnumerable<dynamic>) system.planets).Select (
+                                planet => WrapValues (new string[] {
+                                    system.id, planet.id
+                                })
+                            )));
+                            asteroid_values.Add (String.Join (DELIMITER, ((IEnumerable<dynamic>) system.asteroids).Select (
+                                asteroid => WrapValues (new string[] {
+                                    asteroid.id, asteroid.seed, asteroid.size
+                                })
+                            )));
+                            asteroid_link_values.Add (String.Join (DELIMITER, ((IEnumerable<dynamic>) system.asteroids).Select (
+                                asteroid => WrapValues (new string[] {
+                                    system.id, asteroid.id
+                                })
+                            )));
                         }
 
                         /* Execute generated SQL */
@@ -95,18 +87,18 @@ namespace BitNaughts {
                                 "DELETE FROM dbo.Planets",
                                 "DELETE FROM dbo.Asteroids",
                                 /* Cleaning Relation Tables */
-                                "DELETE FROM dbo.SystemLinks",
-                                "DELETE FROM dbo.PlanetLinks",
-                                "DELETE FROM dbo.AsteroidLinks",
+                                // "DELETE FROM dbo.SystemLinks",
+                                // "DELETE FROM dbo.PlanetLinks",
+                                // "DELETE FROM dbo.AsteroidLinks",
                                 /* Populating Entity Tables */
                                 "INSERT INTO dbo.Galaxies " + galaxy_values,
                                 "INSERT INTO dbo.Systems " + String.Join (DELIMITER, system_values.ToArray ()),
                                 "INSERT INTO dbo.Planets " + String.Join (DELIMITER, planet_values.ToArray ()),
-                                "INSERT INTO dbo.Asteroids " + String.Join (DELIMITER, asteroid_values.ToArray ()),
+                                "INSERT INTO dbo.Asteroids " + String.Join (DELIMITER, asteroid_values.ToArray ())//,
                                 /* Populating Relation Tables */
-                                "INSERT INTO dbo.SystemLinks " + String.Join (DELIMITER, system_link_values.ToArray ()),
-                                "INSERT INTO dbo.PlanetLinks " + String.Join (DELIMITER, planet_link_values.ToArray ()),
-                                "INSERT INTO dbo.AsteroidLinks " + String.Join (DELIMITER, asteroid_link_values.ToArray ())
+                                // "INSERT INTO dbo.SystemLinks " + String.Join (DELIMITER, system_link_values.ToArray ()),
+                                // "INSERT INTO dbo.PlanetLinks " + String.Join (DELIMITER, planet_link_values.ToArray ()),
+                                // "INSERT INTO dbo.AsteroidLinks " + String.Join (DELIMITER, asteroid_link_values.ToArray ())
                             }
                         );
                     case "add":
