@@ -105,7 +105,7 @@ namespace BitNaughts {
                 }
                 return "Flag not set...";
             } catch (Exception ex) {
-                return debug + ex.ToString ();
+                return ex.ToString ();
             }
         }
 
