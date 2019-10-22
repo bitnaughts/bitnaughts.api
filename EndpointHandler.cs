@@ -118,20 +118,32 @@ namespace BitNaughts {
 
         [FunctionName ("Read")] /* API Endpoint: /api/read?table=players&fields=* */
         public static async Task<string> Read ([HttpTrigger (AuthorizationLevel.Anonymous, "get", Route = "read")] HttpRequest req) {
+            try {
+                /* Returns formatted result of selection query */
+                switch (req.Query["flag"]) {
+                    case "generic":
 
-            /* Returns formatted result of selection query */
-            dynamic req_body = await GetBody (req.Body);
-            return ExecuteQuery (
-                String.Format (
-                    "SELECT {1} FROM dbo.{0} WHERE {2}", /* SQL Query to be executed */
-                    req.Query["table"],
-                    String.Join (
-                        DELIMITER,
-                        req_body.values.ToObject<string[]> ()
-                    ),
-                    req_body.condition
-                )
-            );
+                        dynamic req_body = await GetBody (req.Body);
+                        return ExecuteQuery (
+                            String.Format (
+                                "SELECT {1} FROM dbo.{0} WHERE {2}", /* SQL Query to be executed */
+                                req.Query["table"],
+                                String.Join (
+                                    DELIMITER,
+                                    req_body.values.ToObject<string[]> ()
+                                ),
+                                req_body.condition
+                            )
+                        );
+                    case "fun-facts":
+                        return ExecuteQuery (
+                            "To be determined... complex, fun facts sort of queries to satisfy requirements for DB project"
+                        );
+                }
+                return "Flag not set...";
+            } catch (Exception ex) {
+                return ex.ToString ();
+            }
         }
 
         [FunctionName ("Update")] /* API Endpoint: /api/update?table=players */
@@ -244,7 +256,7 @@ namespace BitNaughts {
             } catch (Exception ex) {
                 return String.Format (
                     "Error({0}): {1}",
-                    query,
+                    query.Length > 50 ? query.Substring(0, 50) + "..." : query,
                     ex.ToString ()
                 );
             }
@@ -271,7 +283,7 @@ namespace BitNaughts {
                         /* Returns number of rows modified */
                         return String.Format (
                             "Query({0}): {1} Row(s) Modified",
-                            query,
+                            query.Length > 50 ? query.Substring(0, 50) + "..." : query,
                             rows_modified
                         );
                     }
@@ -279,7 +291,7 @@ namespace BitNaughts {
             } catch (Exception ex) {
                 return String.Format (
                     "Error({0}): {1}",
-                    query,
+                    query.Length > 50 ? query.Substring(0, 50) + "..." : query,
                     ex.ToString ()
                 );
             };
