@@ -18,139 +18,104 @@ namespace BitNaughts {
 
         /* Endpoint Functions */
         /* * * * * * * * * * */
-
         [FunctionName ("Create")] /* API Endpoints: /api/create?flag=reset, /api/create?flag=add&table=players */
         public static async Task<string> Create ([HttpTrigger (AuthorizationLevel.Anonymous, "post", Route = "create")] HttpRequest req) {
+            string debug = "";
+            try {
+                /* Reads data into table and returns transaction receipt */
+                switch (req.Query["flag"]) {
+                    case "reset":
 
-            /* Reads data into table and returns transaction receipt */
-            switch (req.Query["flag"]) {
-                case "reset":
+                        /* Pulls galaxy JSON from HTTP Body */
+                        dynamic galaxy_json = await GetBody (req.Body);
 
-                    /* Pulls galaxy JSON from HTTP Body */
-                    dynamic galaxy_json = await GetBody (req.Body);
+                        /* Entity Table Values */
+                        string galaxy_values = "";
+                        string system_values = "";
+                        List<string> planet_values = new List<string> ();
+                        List<string> asteroid_values = new List<string> ();
 
-                    /* JSON Enumerable */
-                    IEnumerable<dynamic> json;
+                        /* Relation Table Values */
+                        List<string> system_link_values = new List<string> ();
+                        List<string> planet_link_values = new List<string> ();
+                        List<string> asteroid_link_values = new List<string> ();
 
-                    /* Entity Table Values */
-                    string galaxy_values = "";
-                    List<string> system_values = new List<string> ();
-                    List<string> planet_values = new List<string> ();
-                    List<string> asteroid_values = new List<string> ();
-
-                    /* Relation Table Values */
-                    List<string> system_link_values = new List<string> ();
-                    List<string> planet_link_values = new List<string> ();
-                    List<string> asteroid_link_values = new List<string> ();
-
-                    /* Agregrates Table Values */
-                    galaxy_values = WrapValues (new string[] {
-                        galaxy_json.id, galaxy_json.seed
-                    });
-                    
-                    json = galaxy_json["systems"];
-                    system_values.Add (String.Join (DELIMITER, json.Select (
-                        system => WrapValues (new string[] {
-                            system.id, system.seed, system.position_x, system.position_y
-                        })
-                    )));
-                    foreach (dynamic system in galaxy_json["systems"]) {
-                        
-                        json = system["connected_systems"];
-                        system_link_values.Add (
-                            String.Join (DELIMITER, json.Select (
-                                connected_system => WrapValues (new string[] {
-                                    galaxy_json.id, system.id, connected_system.id
-                                })
-                            ))
-                        );
-                        
-                        json = system["planets"];
-                        planet_values.Add (String.Join (DELIMITER, json.Select (
-                            planet => WrapValues (new string[] {
-                                planet.id, planet.seed
+                        /* Agregrates Table Values */
+                        galaxy_values = WrapValues (new string[] {
+                            galaxy_json.id, galaxy_json.seed
+                        });
+                        system_values = String.Join (DELIMITER, ((IEnumerable<dynamic>) galaxy_json.systems).Select (
+                            system => WrapValues (new string[] {
+                                system.id, system.seed, system.position_x, system.position_y
                             })
-                        )));
-                        planet_link_values.Add (
-                            String.Join (DELIMITER, json.Select (
+                        ));
+
+                        foreach (dynamic system in galaxy_json.systems) {
+                            system_link_values.Add (
+                                String.Join (DELIMITER, ((IEnumerable<dynamic>) system.connected_systems).Select (
+                                    connected_system => WrapValues (new string[] {
+                                        galaxy_json.id, system.id, connected_system
+                                    })
+                                ))
+                            );
+                            planet_values.Add (String.Join (DELIMITER, ((IEnumerable<dynamic>) system.planets).Select (
                                 planet => WrapValues (new string[] {
-                                    system.id, planet.id
+                                    planet.id, planet.seed
                                 })
-                            ))
-                        );
-                        
-                        json = system["asteroids"];
-                        asteroid_values.Add (
-                            String.Join (DELIMITER, json.Select (
-                                asteroid => WrapValues (new string[] {
-                                    asteroid.id, asteroid.seed, asteroid.size
-                                })
-                            ))
-                        );
-                        asteroid_link_values.Add (
-                            String.Join (DELIMITER, json.Select (
-                                asteroid => WrapValues (new string[] {
-                                    system.id, asteroid.id
-                                })
-                            ))
-                        );
-                    }
-
-                    /* Wipes tables and injects new values */
-                    return String.Join("\n", new string[] {
-                            /* Cleaning Entity Tables */
-                            "DELETE FROM dbo.Galaxies",
-                            "DELETE FROM dbo.Systems",
-                            "DELETE FROM dbo.Planets",
-                            "DELETE FROM dbo.Asteroids",
-                            /* Cleaning Relation Tables */
-                            "DELETE FROM dbo.SystemLinks",
-                            "DELETE FROM dbo.PlanetLinks",
-                            "DELETE FROM dbo.AsteroidLinks",
-                            /* Populating Entity Tables */
-                            "INSERT INTO dbo.Galaxies " + galaxy_values,
-                            "INSERT INTO dbo.Systems " + String.Join (DELIMITER, system_values.ToArray ()),
-                            "INSERT INTO dbo.Planets " + String.Join (DELIMITER, planet_values.ToArray ()),
-                            "INSERT INTO dbo.Asteroids " + String.Join (DELIMITER, asteroid_values.ToArray ()),
-                            /* Populating Relation Tables */
-                            "INSERT INTO dbo.SystemLinks " + String.Join (DELIMITER, system_link_values.ToArray ()),
-                            "INSERT INTO dbo.PlanetLinks " + String.Join (DELIMITER, planet_link_values.ToArray ()),
-                            "INSERT INTO dbo.AsteroidLinks " + String.Join (DELIMITER, asteroid_link_values.ToArray ())
+                            )));
+                            planet_link_values.Add (
+                                String.Join (DELIMITER, ((IEnumerable<dynamic>) system.planets).Select (
+                                    planet => WrapValues (new string[] {
+                                        system.id, planet.id
+                                    })
+                                ))
+                            );
+                            asteroid_values.Add (
+                                String.Join (DELIMITER, ((IEnumerable<dynamic>) system.asteroids).Select (
+                                    asteroid => WrapValues (new string[] {
+                                        asteroid.id, asteroid.seed, asteroid.size
+                                    })
+                                ))
+                            );
+                            asteroid_link_values.Add (
+                                String.Join (DELIMITER, ((IEnumerable<dynamic>) system.planeasteroidsts).Select (
+                                    asteroid => WrapValues (new string[] {
+                                        system.id, asteroid.id
+                                    })
+                                ))
+                            );
                         }
-                    );
-                    // return ExecuteNonQuery (
-                    //     new string[] {
-                    //         /* Cleaning Entity Tables */
-                    //         "DELETE FROM dbo.Galaxies",
-                    //         "DELETE FROM dbo.Systems",
-                    //         "DELETE FROM dbo.Planets",
-                    //         "DELETE FROM dbo.Asteroids",
-                    //         /* Cleaning Relation Tables */
-                    //         "DELETE FROM dbo.SystemLinks",
-                    //         "DELETE FROM dbo.PlanetLinks",
-                    //         "DELETE FROM dbo.AsteroidLinks",
-                    //         /* Populating Entity Tables */
-                    //         "INSERT INTO dbo.Galaxies " + galaxy_values,
-                    //         "INSERT INTO dbo.Systems " + String.Join (DELIMITER, system_values.ToArray ()),
-                    //         "INSERT INTO dbo.Planets " + String.Join (DELIMITER, planet_values.ToArray ()),
-                    //         "INSERT INTO dbo.Asteroids " + String.Join (DELIMITER, asteroid_values.ToArray ()),
-                    //         /* Populating Relation Tables */
-                    //         "INSERT INTO dbo.SystemLinks " + String.Join (DELIMITER, system_link_values.ToArray ()),
-                    //         "INSERT INTO dbo.PlanetLinks " + String.Join (DELIMITER, planet_link_values.ToArray ()),
-                    //         "INSERT INTO dbo.AsteroidLinks " + String.Join (DELIMITER, asteroid_link_values.ToArray ())
-                    //     }
-                    // );
-                case "add":
-                    // return ExecuteNonQuery (
-                    //     String.Format(
-                    //         "INSERT INTO dbo.{0} {1}",
-                    //         req.Query["table"],
 
-                    //     )
-                    // )
-                    return "";
+                        /* Execute generated SQL */
+                        return ExecuteNonQuery (
+                            new string[] {
+                                /* Cleaning Entity Tables */
+                                "DELETE FROM dbo.Galaxies",
+                                "DELETE FROM dbo.Systems",
+                                "DELETE FROM dbo.Planets",
+                                "DELETE FROM dbo.Asteroids",
+                                /* Cleaning Relation Tables */
+                                "DELETE FROM dbo.SystemLinks",
+                                "DELETE FROM dbo.PlanetLinks",
+                                "DELETE FROM dbo.AsteroidLinks",
+                                /* Populating Entity Tables */
+                                "INSERT INTO dbo.Galaxies " + galaxy_values,
+                                "INSERT INTO dbo.Systems " + String.Join (DELIMITER, system_values.ToArray ()),
+                                "INSERT INTO dbo.Planets " + String.Join (DELIMITER, planet_values.ToArray ()),
+                                "INSERT INTO dbo.Asteroids " + String.Join (DELIMITER, asteroid_values.ToArray ()),
+                                /* Populating Relation Tables */
+                                "INSERT INTO dbo.SystemLinks " + String.Join (DELIMITER, system_link_values.ToArray ()),
+                                "INSERT INTO dbo.PlanetLinks " + String.Join (DELIMITER, planet_link_values.ToArray ()),
+                                "INSERT INTO dbo.AsteroidLinks " + String.Join (DELIMITER, asteroid_link_values.ToArray ())
+                            }
+                        );
+                    case "add":
+                        return "Add not set up yet";
+                }
+                return "Flag not set...";
+            } catch (Exception ex) {
+                return debug + ex.ToString ();
             }
-            return "Flag not set...";
         }
 
         [FunctionName ("Read")] /* API Endpoint: /api/read?table=players&fields=* */
@@ -222,7 +187,7 @@ namespace BitNaughts {
             }
         }
         public static string WrapValues (string[] values) {
-            return "Values (" + String.Join (DELIMITER, values) + ")";
+            return "(" + String.Join (DELIMITER, values) + ")";
         }
         public static IEnumerable<dynamic> GetEnum (dynamic json) {
             IEnumerable<dynamic> enum_json = json;
