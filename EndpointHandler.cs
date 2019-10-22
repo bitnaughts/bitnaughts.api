@@ -77,8 +77,7 @@ namespace BitNaughts {
                         }
 
                         /* Execute generated SQL */
-                        // return ExecuteNonQuery (
-                        return String.Join("\n",
+                        return ExecuteNonQuery (
                             new string[] {
                                 /* Cleaning Entity Tables */
                                 "DELETE FROM dbo.Galaxies",
