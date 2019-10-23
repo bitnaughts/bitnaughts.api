@@ -28,16 +28,14 @@ namespace BitNaughts {
                         /* Pulls galaxy JSON from HTTP Body */
                         dynamic galaxy = await GetBody (req.Body);
 
-                        /* Entity Table Values */
+                        /* Initializing Table Values */
                         string galaxy_values = "";
                         string system_values = "";
-                        List<string> planet_values = new List<string> ();
-                        List<string> asteroid_values = new List<string> ();
-
-                        /* Relation Table Values */
                         string system_link_values = "";
                         List<string> system_connection_values = new List<string> ();
+                        List<string> planet_values = new List<string> ();
                         List<string> planet_link_values = new List<string> ();
+                        List<string> asteroid_values = new List<string> ();
                         List<string> asteroid_link_values = new List<string> ();
 
                         /* Agregrates Table Values */
@@ -184,31 +182,20 @@ namespace BitNaughts {
         /* Assembles HTTP Body byte-stream into JSON */
         public static async Task<dynamic> GetBody (Stream body) {
             using (var reader = new StreamReader (body)) {
-                string body_stream = await reader.ReadToEndAsync ();
-                return Newtonsoft.Json.JsonConvert.DeserializeObject (body_stream);
+                return Newtonsoft.Json.JsonConvert.DeserializeObject (await reader.ReadToEndAsync ());
             }
         }
 
-        public static async Task<Dictionary<string, string>> GetBodyAsDict (HttpRequest req) {
-            using (var reader = new StreamReader (req.Body)) {
-                string body_stream = await reader.ReadToEndAsync ();
-                return ((IEnumerable<KeyValuePair<string, Newtonsoft.Json.Linq.JToken>>) Newtonsoft.Json.JsonConvert.DeserializeObject (body_stream))
-                    .ToDictionary (param => param.Key, param => param.Value.ToString ());
-            }
-        }
+        /* Abstracting SQL Values to string array  */
         public static string WrapValues (string[] values) {
             return "(" + String.Join (DELIMITER, values) + ")";
-        }
-        public static IEnumerable<dynamic> GetEnum (dynamic json) {
-            IEnumerable<dynamic> enum_json = json;
-            return enum_json;
         }
 
         /* Manages database connection, runs queries, and returns results */
         public static string ExecuteQuery (string[] queries) {
             string result = "";
             foreach (string query in queries) {
-            result += ExecuteQuery (query) + "\n";
+                result += ExecuteQuery (query) + "\n";
             }
             return result;
         }
@@ -256,7 +243,7 @@ namespace BitNaughts {
             } catch (Exception ex) {
                 return String.Format (
                     "Error({0}): {1}",
-                    query.Length > 50 ? query.Substring(0, 50) + "..." : query,
+                    query.Length > 50 ? query.Substring (0, 50) + "..." : query,
                     ex.ToString ()
                 );
             }
@@ -283,7 +270,7 @@ namespace BitNaughts {
                         /* Returns number of rows modified */
                         return String.Format (
                             "Query({0}): {1} Row(s) Modified",
-                            query.Length > 50 ? query.Substring(0, 50) + "..." : query,
+                            query.Length > 50 ? query.Substring (0, 50) + "..." : query,
                             rows_modified
                         );
                     }
@@ -291,7 +278,7 @@ namespace BitNaughts {
             } catch (Exception ex) {
                 return String.Format (
                     "Error({0}): {1}",
-                    query.Length > 50 ? query.Substring(0, 50) + "..." : query,
+                    query.Length > 50 ? query.Substring (0, 50) + "..." : query,
                     ex.ToString ()
                 );
             };
