@@ -33,10 +33,10 @@ public static class SQLHandler {
 
     /*  */
     public static string DeleteFrom (Dictionary<string, string> values) {
-        string receipt = String.Format ("{0}: Adding {1} rows into {2}",
+        string receipt = String.Format ("{0}: Adding {1} rows into Tables({2})",
             DateTime.Now.ToShortTimeString (),
             values.Count,
-            new List<string> (values.Keys).ToArray ()
+            String.Join (DELIMITER, new List<string> (values.Keys).ToArray ())
         );
         foreach (KeyValuePair<string, string> value in values) {
             receipt += (value.Value == ALL) ?
@@ -57,7 +57,7 @@ public static class SQLHandler {
         string receipt = String.Format ("{0}: Adding {1} rows into Tables({2})",
             DateTime.Now.ToShortTimeString (),
             values.Count,
-            new List<string> (values.Keys).ToArray ()
+            String.Join (DELIMITER, new List<string> (values.Keys).ToArray ())
         );
         foreach (KeyValuePair<string, List<string>> value in values) {
             receipt += InsertInto (value.Key, value.Value);
