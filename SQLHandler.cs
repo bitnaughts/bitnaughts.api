@@ -33,7 +33,11 @@ public static class SQLHandler {
 
     /*  */
     public static string DeleteFrom (Dictionary<string, string> values) {
-        string receipt = "";
+        string receipt = String.Format ("{0}: Adding {1} rows into {2}",
+            DateTime.Now.ToShortTimeString(),
+            values.Count,
+            new List<string>(values.Keys).ToArray()
+        );
         foreach (KeyValuePair<string, string> value in values) {
             receipt += (value.Value == ALL) ?
                 ExecuteNonQuery (String.Format (
@@ -50,7 +54,11 @@ public static class SQLHandler {
     }
 
     public static string InsertInto (Dictionary<string, List<string>> values) {
-        string receipt = "";
+        string receipt = String.Format ("{0}: Adding {1} rows into Tables({2})",
+            DateTime.Now.ToShortTimeString(),
+            values.Count,
+            new List<string>(values.Keys).ToArray()
+        );
         foreach (KeyValuePair<string, List<string>> value in values) {
             receipt += InsertInto (value.Key, value.Value);
         }
@@ -58,10 +66,14 @@ public static class SQLHandler {
     }
 
     public static string InsertInto (string table, List<string> values) {
-        string receipt = "";
-        int batch_index = 0;
+        string receipt = String.Format ("{0}: Adding {1} rows into {2}",
+            DateTime.Now.ToShortTimeString(),
+            values.Count,
+            table
+        );
 
         /* While there are still too many values to insert at once */
+        int batch_index = 0;
         while (values.Count - batch_index > 0) {
 
             /* Insert a batch of values */
@@ -162,6 +174,67 @@ public static class SQLHandler {
                 }
             }
         } catch (Exception ex) {
+            return String.Format(
+                String.Join(",", new string[]{ 
+                    "'id':'route'",
+                    "'type':'line'",
+                    
+                })
+                
+                )
+                 + 
+                ," +
+                "'source':{" +  
+                    "type":"geojson",
+                    "data":{ 
+                        "type":"Feature",
+                        "properties":{ 
+
+                        },
+                        "geometry":{ 
+                            "type":"LineString",
+                            "coordinates":[ 
+                            [ 
+                                -121.128508,
+                                37.741399
+                            ],
+                            [ 
+                                -121.128570,
+                                37.737564
+                            ],
+                            [ 
+                                -121.123964,
+                                37.737516
+                            ],
+                            [ 
+                                -121.124012,
+                                37.740205
+                            ],
+                            [ 
+                                -121.128509,
+                                37.741359
+                            ]
+                            ]
+                        }
+                    }
+                },
+                "layout":{ 
+                    "line-join":"round",
+                    "line-cap":"round"
+                },
+                "paint":{ 
+                    "line-color":"#888",
+                    "line-width":8
+                }
+                }
+            // Appending cord x and y values.
+            for (int i = 0; i < query_result.Count; i++)
+            {
+                return_string += "[" + query_result[i] + "]";
+                return_string += (i != query_result.Count - 1 ? "," : "");
+            }
+            // Ending the JSON file
+            return_string += ";
             return String.Format (
                 "Error({0}): {1}\n",
                 query.Length > 50 ? query.Substring (0, 50) + "..." : query,
@@ -170,3 +243,6 @@ public static class SQLHandler {
         };
     }
 }
+
+
+
