@@ -16,10 +16,12 @@ public static class SQLHandler {
         NEW_LINE = "\n";
 
     /* Common conditions */
-    public const string ALL = "*";
+    public const string COLUMNS = "columns",
+        ALL = "*";
 
     /* TABLE NAMES */
-    public const string GALAXIES = "dbo.Galaxies",
+    public const string TABLE = "table",
+        GALAXIES = "dbo.Galaxies",
         SYSTEMS = "dbo.Systems",
         SYSTEM_LINKS = "dbo.SystemLinks",
         SYSTEM_CONNECTIONS = "dbo.SystemConnections",
@@ -28,11 +30,21 @@ public static class SQLHandler {
         ASTEROIDS = "dbo.Asteroids",
         ASTEROID_LINKS = "dbo.AsteroidLinks";
 
+    public const string CONDITION = "condition";
+
     /* MS SQL has been shown to perform best when inserting groups of 25 values at a time. See https://www.red-gate.com/simple-talk/sql/performance/comparing-multiple-rows-insert-vs-single-row-insert-with-three-data-load-methods/ */
     public const int INSERT_BATCH_SIZE = 25;
 
-    /*  */
-    public static string DeleteFrom (Dictionary<string, string> values) {
+    public static string Select (Dictionary<string, string> parameters) {
+        return ExecuteQuery (String.Format (
+            "SELECT {1} FROM {0} WHERE {2}", /* SQL Query to be executed */
+            parameters[TABLE],
+            parameters[COLUMNS],
+            parameters[CONDITION]
+        ));
+    }
+
+    public static string Delete (Dictionary<string, string> values) {
         string receipt = String.Format ("{0}: Adding {1} rows into Tables({2})\n",
             DateTime.Now.ToShortTimeString (),
             values.Count,
@@ -53,19 +65,19 @@ public static class SQLHandler {
         return receipt;
     }
 
-    public static string InsertInto (Dictionary<string, List<string>> values) {
+    public static string Insert (Dictionary<string, List<string>> values) {
         string receipt = String.Format ("{0}: Adding {1} rows into Tables({2})\n",
             DateTime.Now.ToShortTimeString (),
             values.Count,
             String.Join (DELIMITER, new List<string> (values.Keys).ToArray ())
         );
         foreach (KeyValuePair<string, List<string>> value in values) {
-            receipt += InsertInto (value.Key, value.Value);
+            receipt += Insert (value.Key, value.Value);
         }
         return receipt;
     }
 
-    public static string InsertInto (string table, List<string> values) {
+    public static string Insert (string table, List<string> values) {
         string receipt = String.Format ("{0}: Adding {1} rows into {2}\n",
             DateTime.Now.ToShortTimeString (),
             values.Count,
