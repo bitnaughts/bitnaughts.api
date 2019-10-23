@@ -33,16 +33,16 @@ public static class SQLHandler {
 
     public static string DeleteFrom (Dictionary<string, string> values) {
         string receipt = "";
-        foreach (KeyValuePair<string, List<string>> query in values) {
+        foreach (KeyValuePair<string, string> value in values) {
             receipt += (value.Value == ALL) ?
                 ExecuteNonQuery (String.Format (
                     "DELETE FROM {0}", /* SQL Query to be executed when no condition is specified*/
-                    query.Key
+                    value.Key
                 )) :
                 ExecuteNonQuery (String.Format (
                     "DELETE FROM {0} WHERE {1}", /* SQL Query to be executed when a condition is specified */
-                    query.Key,
-                    query.Value
+                    value.Key,
+                    value.Value
                 ));
         }
         return receipt;
@@ -68,7 +68,7 @@ public static class SQLHandler {
                 "INSERT INTO {0} VALUES {1}", /* SQL Query to be executed */
                 table,
                 String.Join (DELIMITER, values.Skip (batch_index).Take (INSERT_BATCH_SIZE).ToArray ())
-            ))
+            ));
 
             /* Keeping track of how many values have been added */
             batch_index += INSERT_BATCH_SIZE;

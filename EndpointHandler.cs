@@ -31,75 +31,62 @@ namespace BitNaughts {
                         dynamic galaxy = await GetBody (req.Body);
 
                         /* Initializing Table Values */
-                        List<string> galaxy_values = new List<string> (),
-                            system_values = new List<string> (),
-                            system_link_values = new List<string> (),
-                            system_connection_values = new List<string> (),
-                            planet_values = new List<string> (),
-                            planet_link_values = new List<string> (),
-                            asteroid_values = new List<string> (),
-                            asteroid_link_values = new List<string> ();
+                        Dictionary<string, List<string>> values = new Dictionary<string, List<string>> { { SQLHandler.GALAXIES, new List<string> () },
+                            { SQLHandler.SYSTEMS, new List<string> () },
+                            { SQLHandler.PLANETS, new List<string> () },
+                            { SQLHandler.ASTEROIDS, new List<string> () },
+                            { SQLHandler.SYSTEM_CONNECTIONS, new List<string> () },
+                            { SQLHandler.SYSTEM_LINKS, new List<string> () },
+                            { SQLHandler.PLANET_LINKS, new List<string> () },
+                            { SQLHandler.ASTEROID_LINKS, new List<string> () }
+                        };
 
                         /* Agregrates Table Values */
-                        galaxy_values.Add (WrapValues (new string[] {
+                        values[SQLHandler.GALAXIES].Add (WrapValues (new string[] {
                             galaxy.id, galaxy.seed
                         }));
-                        system_values.Add (String.Join (DELIMITER, ((IEnumerable<dynamic>) galaxy.systems).Select (
+                        values[SQLHandler.SYSTEMS].Add (String.Join (DELIMITER, ((IEnumerable<dynamic>) galaxy.systems).Select (
                             system => WrapValues (new string[] {
                                 system.id, system.seed, system.position_x, system.position_y
                             })
                         )));
-                        system_link_values.Add (String.Join (DELIMITER, ((IEnumerable<dynamic>) galaxy.systems).Select (
+                        values[SQLHandler.SYSTEM_LINKS].Add (String.Join (DELIMITER, ((IEnumerable<dynamic>) galaxy.systems).Select (
                             system => WrapValues (new string[] {
                                 galaxy.id, system.id
                             })
                         )));
                         foreach (dynamic system in galaxy.systems) {
-                            system_connection_values.Add (String.Join (DELIMITER, ((IEnumerable<dynamic>) system.connected_systems).Select (
+                            values[SQLHandler.SYSTEM_CONNECTIONS].Add (String.Join (DELIMITER, ((IEnumerable<dynamic>) system.connected_systems).Select (
                                 connected_system => WrapValues (new string[] {
                                     galaxy.id, system.id, connected_system
                                 })
                             )));
-                            planet_values.Add (String.Join (DELIMITER, ((IEnumerable<dynamic>) system.planets).Select (
+                            values[SQLHandler.PLANETS].Add (String.Join (DELIMITER, ((IEnumerable<dynamic>) system.planets).Select (
                                 planet => WrapValues (new string[] {
                                     planet.id, planet.seed
                                 })
                             )));
-                            planet_link_values.Add (String.Join (DELIMITER, ((IEnumerable<dynamic>) system.planets).Select (
+                            values[SQLHandler.PLANET_LINKS].Add (String.Join (DELIMITER, ((IEnumerable<dynamic>) system.planets).Select (
                                 planet => WrapValues (new string[] {
                                     system.id, planet.id
                                 })
                             )));
-                            asteroid_values.Add (String.Join (DELIMITER, ((IEnumerable<dynamic>) system.asteroids).Select (
+                            values[SQLHandler.ASTEROIDS].Add (String.Join (DELIMITER, ((IEnumerable<dynamic>) system.asteroids).Select (
                                 asteroid => WrapValues (new string[] {
                                     asteroid.id, asteroid.seed, asteroid.size
                                 })
                             )));
-                            asteroid_link_values.Add (String.Join (DELIMITER, ((IEnumerable<dynamic>) system.asteroids).Select (
+                            values[SQLHandler.ASTEROID_LINKS].Add (String.Join (DELIMITER, ((IEnumerable<dynamic>) system.asteroids).Select (
                                 asteroid => WrapValues (new string[] {
                                     system.id, asteroid.id
                                 })
                             )));
                         }
-                        return SQLHandler.DeleteFrom (new Dictionary<string, string> { 
-                            { SQLHandler.GALAXIES, SQLHandler.ALL },
-                            { SQLHandler.SYSTEMS, SQLHandler.ALL },
-                            { SQLHandler.PLANETS, SQLHandler.ALL },
-                            { SQLHandler.ASTEROIDS, SQLHandler.ALL },
-                            { SQLHandler.SYSTEM_CONNECTIONS, SQLHandler.ALL },
-                            { SQLHandler.SYSTEM_LINKS, SQLHandler.ALL },
-                            { SQLHandler.PLANET_LINKS, SQLHandler.ALL },
-                            { SQLHandler.ASTEROID_LINKS, SQLHandler.ALL }
-                        }) + SQLHandler.InsertInto (new Dictionary<string, List<string>> { 
-                            { SQLHandler.GALAXIES, galaxy_values },
-                            { SQLHandler.SYSTEMS, system_values },
-                            { SQLHandler.PLANETS, planet_values },
-                            { SQLHandler.ASTEROIDS, asteroid_values },
-                            { SQLHandler.SYSTEM_CONNECTIONS, system_connection_values },
-                            { SQLHandler.SYSTEM_LINKS, system_link_values },
-                            { SQLHandler.PLANET_LINKS, planet_link_values },
-                            { SQLHandler.ASTEROID_LINKS, asteroid_link_values }
-                        });
+                        return SQLHandler.DeleteFrom (
+                            values.ToDictionary(value => value.Key, value => SQLHandler.ALL)
+                        ) + SQLHandler.InsertInto (
+                            values
+                        );
                 }
             } catch (Exception ex) {
                 return ex.ToString ();
