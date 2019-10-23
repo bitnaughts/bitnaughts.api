@@ -56,27 +56,27 @@ namespace BitNaughts {
                                 connected_system => WrapValues (new string[] {
                                     system.id, connected_system
                                 })
-                            ).ToArray ());
+                            ));
                             values[SQLHandler.PLANETS].AddRange (((IEnumerable<dynamic>) system.planets).Select (
                                 planet => WrapValues (new string[] {
                                     planet.id, planet.seed
                                 })
-                            ).ToArray ());
+                            ));
                             values[SQLHandler.PLANET_LINKS].AddRange (((IEnumerable<dynamic>) system.planets).Select (
                                 planet => WrapValues (new string[] {
                                     system.id, planet.id
                                 })
-                            ).ToArray ());
+                            ));
                             values[SQLHandler.ASTEROIDS].AddRange (((IEnumerable<dynamic>) system.asteroids).Select (
                                 asteroid => WrapValues (new string[] {
                                     asteroid.id, asteroid.seed, asteroid.size
                                 })
-                            ).ToArray ());
+                            ));
                             values[SQLHandler.ASTEROID_LINKS].AddRange (((IEnumerable<dynamic>) system.asteroids).Select (
                                 asteroid => WrapValues (new string[] {
                                     system.id, asteroid.id
                                 })
-                            ).ToArray ());
+                            ));
                         }
                         return SQLHandler.DeleteFrom (values.ToDictionary (value => value.Key, value => SQLHandler.ALL)) + /* For every table referenced, clear all existing values */
                             SQLHandler.InsertInto (values); /* For every table referenced, inject values */
