@@ -33,7 +33,7 @@ public static class SQLHandler {
 
     /*  */
     public static string DeleteFrom (Dictionary<string, string> values) {
-        string receipt = String.Format ("{0}: Adding {1} rows into Tables({2})",
+        string receipt = String.Format ("{0}: Adding {1} rows into Tables({2})\n",
             DateTime.Now.ToShortTimeString (),
             values.Count,
             String.Join (DELIMITER, new List<string> (values.Keys).ToArray ())
@@ -54,7 +54,7 @@ public static class SQLHandler {
     }
 
     public static string InsertInto (Dictionary<string, List<string>> values) {
-        string receipt = String.Format ("{0}: Adding {1} rows into Tables({2})",
+        string receipt = String.Format ("{0}: Adding {1} rows into Tables({2})\n",
             DateTime.Now.ToShortTimeString (),
             values.Count,
             String.Join (DELIMITER, new List<string> (values.Keys).ToArray ())
@@ -66,12 +66,11 @@ public static class SQLHandler {
     }
 
     public static string InsertInto (string table, List<string> values) {
-        string receipt = String.Format ("{0}: Adding {1} rows into {2}",
+        string receipt = String.Format ("{0}: Adding {1} rows into {2}\n",
             DateTime.Now.ToShortTimeString (),
             values.Count,
             table
         );
-
         /* While there are still too many values to insert at once */
         int batch_index = 0;
         while (values.Count - batch_index > 0) {
