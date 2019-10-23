@@ -16,16 +16,32 @@ namespace BitNaughts {
         public const string DELIMITER = ",",
             NEW_LINE = "\n";
 
-        /*  */
+        /* Endpoints */
+        public const string GET = "get",
+            SET = "set";
+
+        /* Operation Types */
+        public const string HTTP_GET = "get",
+            HTTP_POST = "post";
+
+        /* Endpoint Constants (Also see DatabaseHandler.cs) */
+        public const string FLAG = "flag", //These constants should be consolidated into a shared class between the front and back ends...
+            RESET = "reset", //These constants should be consolidated into a shared class between the front and back ends...
+            TYPE = "type", //These constants should be consolidated into a shared class between the front and back ends...
+            ID = "id"; //These constants should be consolidated into a shared class between the front and back ends...
+
+
+        /* Class Types */
+        public const string GALAXY_OBJECT = "GalaxyObject";
 
         /* Endpoint Functions */
         /* * * * * * * * * * */
-        [FunctionName ("Create")] /* API Endpoints: /api/create?flag=reset, /api/create?flag=add&table=players */
-        public static async Task<string> Create ([HttpTrigger (AuthorizationLevel.Anonymous, "post", Route = "create")] HttpRequest req) {
+        [FunctionName (SET)] /* API Endpoints: /api/set?flag=reset, /api/set?flag=add&table=players */
+        public static async Task<string> Set ([HttpTrigger (AuthorizationLevel.Anonymous, HTTP_POST, Route = SET)] HttpRequest req) {
             try {
                 /* Reads data into table and returns transaction receipt */
-                switch (req.Query["flag"]) {
-                    case "reset":
+                switch (req.Query[FLAG]) {
+                    case RESET:
 
                         /* Pulls galaxy JSON from HTTP Body */
                         dynamic galaxy = await GetBody (req.Body);
@@ -78,8 +94,8 @@ namespace BitNaughts {
                                 })
                             ));
                         }
-                        return SQLHandler.DeleteFrom (values.ToDictionary (value => value.Key, value => SQLHandler.ALL)) + /* For every table referenced, clear all existing values */
-                            SQLHandler.InsertInto (values); /* For every table referenced, inject values */
+                        return SQLHandler.Delete (values.ToDictionary (value => value.Key, value => SQLHandler.ALL)) + /* For every table referenced, clear all existing values */
+                            SQLHandler.Insert (values); /* For every table referenced, inject values */
                 }
             } catch (Exception ex) {
                 return ex.ToString ();
@@ -87,12 +103,20 @@ namespace BitNaughts {
             return "NULL?";
         }
 
-        [FunctionName ("Read")] /* API Endpoint: /api/read?table=players&fields=* */
-        public static async Task<string> Read ([HttpTrigger (AuthorizationLevel.Anonymous, "get", Route = "read")] HttpRequest req) {
-            // try {
-            //     /* Returns formatted result of selection query */
-            //     switch (req.Query["flag"]) {
-            //         case "generic":
+        [FunctionName (GET)] /* API Endpoint: /api/get?table=players&fields=* */
+        public static async Task<string> Get ([HttpTrigger (AuthorizationLevel.Anonymous, HTTP_GET, Route = GET)] HttpRequest req) {
+            try {
+                /* Returns formatted result of selection query */
+                switch (req.Query[TYPE]) {
+                    case GALAXY_OBJECT:
+                        return SQLHandler.Select(new Dictionary<string, string>{
+                            {SQLHandler.COLUMNS, SQLHandler.ALL},
+                            {SQLHandler.TABLE, SQLHandler.GALAXIES},
+                            {SQLHandler.CONDITION, "g_galaxy_id = " + req.Query[ID]} //We will want constants class abstract for this sort of class of wanting Galaxies' "g_galaxy_id" wrapped 
+                        });
+                        // string id = req.Query[ID];
+                        // 
+                }
 
             //             dynamic req_body = await GetBody (req.Body);
             //             return ExecuteQuery (
@@ -112,9 +136,9 @@ namespace BitNaughts {
             //             );
             //     }
             //     return "Flag not set...";
-            // } catch (Exception ex) {
-            //     return ex.ToString ();
-            // }
+            } catch (Exception ex) {
+                return ex.ToString ();
+            }
             return "to be implemented";
         }
 
