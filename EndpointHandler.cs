@@ -45,42 +45,38 @@ namespace BitNaughts {
                         values[SQLHandler.GALAXIES].Add (WrapValues (new string[] {
                             galaxy.id, galaxy.seed
                         }));
-                        values[SQLHandler.SYSTEMS].Add (String.Join (DELIMITER, ((IEnumerable<dynamic>) galaxy.systems).Select (
-                            system => WrapValues (new string[] {
-                                system.id, system.seed, system.position_x, system.position_y
-                            })
-                        )));
-                        values[SQLHandler.SYSTEM_LINKS].Add (String.Join (DELIMITER, ((IEnumerable<dynamic>) galaxy.systems).Select (
-                            system => WrapValues (new string[] {
-                                galaxy.id, system.id
-                            })
-                        )));
                         foreach (dynamic system in galaxy.systems) {
-                            values[SQLHandler.SYSTEM_CONNECTIONS].Add (String.Join (DELIMITER, ((IEnumerable<dynamic>) system.connected_systems).Select (
+                            values[SQLHandler.SYSTEMS].Add (WrapValues (new string[] {
+                                system.id, system.seed, system.position_x, system.position_y
+                            }));
+                            values[SQLHandler.SYSTEM_LINKS].Add (WrapValues (new string[] {
+                                galaxy.id, system.id
+                            }));
+                            values[SQLHandler.SYSTEM_CONNECTIONS].AddRange (((IEnumerable<dynamic>) system.connected_systems).Select (
                                 connected_system => WrapValues (new string[] {
                                     system.id, connected_system
                                 })
-                            )));
-                            values[SQLHandler.PLANETS].Add (String.Join (DELIMITER, ((IEnumerable<dynamic>) system.planets).Select (
+                            ).ToArray ());
+                            values[SQLHandler.PLANETS].AddRange (((IEnumerable<dynamic>) system.planets).Select (
                                 planet => WrapValues (new string[] {
                                     planet.id, planet.seed
                                 })
-                            )));
-                            values[SQLHandler.PLANET_LINKS].Add (String.Join (DELIMITER, ((IEnumerable<dynamic>) system.planets).Select (
+                            ).ToArray ());
+                            values[SQLHandler.PLANET_LINKS].AddRange (((IEnumerable<dynamic>) system.planets).Select (
                                 planet => WrapValues (new string[] {
                                     system.id, planet.id
                                 })
-                            )));
-                            values[SQLHandler.ASTEROIDS].Add (String.Join (DELIMITER, ((IEnumerable<dynamic>) system.asteroids).Select (
+                            ).ToArray ());
+                            values[SQLHandler.ASTEROIDS].AddRange (((IEnumerable<dynamic>) system.asteroids).Select (
                                 asteroid => WrapValues (new string[] {
                                     asteroid.id, asteroid.seed, asteroid.size
                                 })
-                            )));
-                            values[SQLHandler.ASTEROID_LINKS].Add (String.Join (DELIMITER, ((IEnumerable<dynamic>) system.asteroids).Select (
+                            ).ToArray ());
+                            values[SQLHandler.ASTEROID_LINKS].AddRange (((IEnumerable<dynamic>) system.asteroids).Select (
                                 asteroid => WrapValues (new string[] {
                                     system.id, asteroid.id
                                 })
-                            )));
+                            ).ToArray ());
                         }
                         return SQLHandler.DeleteFrom (values.ToDictionary (value => value.Key, value => SQLHandler.ALL)) + /* For every table referenced, clear all existing values */
                             SQLHandler.InsertInto (values); /* For every table referenced, inject values */
