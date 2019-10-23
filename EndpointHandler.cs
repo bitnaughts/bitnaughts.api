@@ -13,8 +13,10 @@ namespace BitNaughts {
     public static class EndpointHandler {
 
         /* Result-formatting constants */
-        public const string DELIMITER = ",";
-        public const string NEW_LINE = "\n";
+        public const string DELIMITER = ",",
+            NEW_LINE = "\n";
+
+        /*  */
 
         /* Endpoint Functions */
         /* * * * * * * * * * */
@@ -29,29 +31,29 @@ namespace BitNaughts {
                         dynamic galaxy = await GetBody (req.Body);
 
                         /* Initializing Table Values */
-                        string galaxy_values = "";
-                        string system_values = "";
-                        string system_link_values = "";
-                        List<string> system_connection_values = new List<string> ();
-                        List<string> planet_values = new List<string> ();
-                        List<string> planet_link_values = new List<string> ();
-                        List<string> asteroid_values = new List<string> ();
-                        List<string> asteroid_link_values = new List<string> ();
+                        List<string> galaxy_values = new List<string> (),
+                            system_values = new List<string> (),
+                            system_link_values = new List<string> (),
+                            system_connection_values = new List<string> (),
+                            planet_values = new List<string> (),
+                            planet_link_values = new List<string> (),
+                            asteroid_values = new List<string> (),
+                            asteroid_link_values = new List<string> ();
 
                         /* Agregrates Table Values */
-                        galaxy_values = WrapValues (new string[] {
+                        galaxy_values.Add (WrapValues (new string[] {
                             galaxy.id, galaxy.seed
-                        });
-                        system_values = String.Join (DELIMITER, ((IEnumerable<dynamic>) galaxy.systems).Select (
+                        }));
+                        system_values.Add (String.Join (DELIMITER, ((IEnumerable<dynamic>) galaxy.systems).Select (
                             system => WrapValues (new string[] {
                                 system.id, system.seed, system.position_x, system.position_y
                             })
-                        ));
-                        system_link_values = String.Join (DELIMITER, ((IEnumerable<dynamic>) galaxy.systems).Select (
+                        )));
+                        system_link_values.Add (String.Join (DELIMITER, ((IEnumerable<dynamic>) galaxy.systems).Select (
                             system => WrapValues (new string[] {
                                 galaxy.id, system.id
                             })
-                        ));
+                        )));
                         foreach (dynamic system in galaxy.systems) {
                             system_connection_values.Add (String.Join (DELIMITER, ((IEnumerable<dynamic>) system.connected_systems).Select (
                                 connected_system => WrapValues (new string[] {
@@ -79,101 +81,95 @@ namespace BitNaughts {
                                 })
                             )));
                         }
-
-                        /* Execute generated SQL */
-                        return ExecuteNonQuery (
-                            new string[] {
-                                /* Cleaning Entity Tables */
-                                "DELETE FROM dbo.Galaxies",
-                                "DELETE FROM dbo.Systems",
-                                "DELETE FROM dbo.Planets",
-                                "DELETE FROM dbo.Asteroids",
-                                /* Cleaning Relation Tables */
-                                "DELETE FROM dbo.SystemLinks",
-                                "DELETE FROM dbo.SystemConnections",
-                                "DELETE FROM dbo.PlanetLinks",
-                                "DELETE FROM dbo.AsteroidLinks",
-                                /* Populating Entity Tables */
-                                "INSERT INTO dbo.Galaxies VALUES" + galaxy_values,
-                                "INSERT INTO dbo.Systems VALUES" + system_values,
-                                "INSERT INTO dbo.Planets VALUES" + String.Join (DELIMITER, planet_values.ToArray ()),
-                                "INSERT INTO dbo.Asteroids VALUES" + String.Join (DELIMITER, asteroid_values.ToArray ()),
-                                /* Populating Relation Tables */
-                                "INSERT INTO dbo.SystemLinks VALUES" + system_link_values,
-                                "INSERT INTO dbo.SystemConnections VALUES" + String.Join (DELIMITER, system_connection_values.ToArray ()),
-                                "INSERT INTO dbo.PlanetLinks VALUES" + String.Join (DELIMITER, planet_link_values.ToArray ()),
-                                "INSERT INTO dbo.AsteroidLinks VALUES" + String.Join (DELIMITER, asteroid_link_values.ToArray ())
-                            }
-                        );
-                    case "add":
-                        return "Add not set up yet";
+                        return SQLHandler.DeleteFrom (new Dictionary<string, string> { 
+                            { SQLHandler.GALAXIES, SQLHandler.ALL },
+                            { SQLHandler.SYSTEMS, SQLHandler.ALL },
+                            { SQLHandler.PLANETS, SQLHandler.ALL },
+                            { SQLHandler.ASTEROIDS, SQLHandler.ALL },
+                            { SQLHandler.SYSTEM_CONNECTIONS, SQLHandler.ALL },
+                            { SQLHandler.SYSTEM_LINKS, SQLHandler.ALL },
+                            { SQLHandler.PLANET_LINKS, SQLHandler.ALL },
+                            { SQLHandler.ASTEROID_LINKS, SQLHandler.ALL }
+                        }) + SQLHandler.InsertInto (new Dictionary<string, List<string>> { 
+                            { SQLHandler.GALAXIES, galaxy_values },
+                            { SQLHandler.SYSTEMS, system_values },
+                            { SQLHandler.PLANETS, planet_values },
+                            { SQLHandler.ASTEROIDS, asteroid_values },
+                            { SQLHandler.SYSTEM_CONNECTIONS, system_connection_values },
+                            { SQLHandler.SYSTEM_LINKS, system_link_values },
+                            { SQLHandler.PLANET_LINKS, planet_link_values },
+                            { SQLHandler.ASTEROID_LINKS, asteroid_link_values }
+                        });
                 }
-                return "Flag not set...";
             } catch (Exception ex) {
                 return ex.ToString ();
             }
+            return "NULL?";
         }
 
         [FunctionName ("Read")] /* API Endpoint: /api/read?table=players&fields=* */
         public static async Task<string> Read ([HttpTrigger (AuthorizationLevel.Anonymous, "get", Route = "read")] HttpRequest req) {
-            try {
-                /* Returns formatted result of selection query */
-                switch (req.Query["flag"]) {
-                    case "generic":
+            // try {
+            //     /* Returns formatted result of selection query */
+            //     switch (req.Query["flag"]) {
+            //         case "generic":
 
-                        dynamic req_body = await GetBody (req.Body);
-                        return ExecuteQuery (
-                            String.Format (
-                                "SELECT {1} FROM dbo.{0} WHERE {2}", /* SQL Query to be executed */
-                                req.Query["table"],
-                                String.Join (
-                                    DELIMITER,
-                                    req_body.values.ToObject<string[]> ()
-                                ),
-                                req_body.condition
-                            )
-                        );
-                    case "fun-facts":
-                        return ExecuteQuery (
-                            "To be determined... complex, fun facts sort of queries to satisfy requirements for DB project"
-                        );
-                }
-                return "Flag not set...";
-            } catch (Exception ex) {
-                return ex.ToString ();
-            }
+            //             dynamic req_body = await GetBody (req.Body);
+            //             return ExecuteQuery (
+            //                 String.Format (
+            //                     "SELECT {1} FROM dbo.{0} WHERE {2}", /* SQL Query to be executed */
+            //                     req.Query["table"],
+            //                     String.Join (
+            //                         DELIMITER,
+            //                         req_body.values.ToObject<string[]> ()
+            //                     ),
+            //                     req_body.condition
+            //                 )
+            //             );
+            //         case "fun-facts":
+            //             return ExecuteQuery (
+            //                 "To be determined... complex, fun facts sort of queries to satisfy requirements for DB project"
+            //             );
+            //     }
+            //     return "Flag not set...";
+            // } catch (Exception ex) {
+            //     return ex.ToString ();
+            // }
+            return "to be implemented";
         }
 
         [FunctionName ("Update")] /* API Endpoint: /api/update?table=players */
         public static async Task<string> Update ([HttpTrigger (AuthorizationLevel.Anonymous, "put", Route = "update")] HttpRequest req) {
 
-            /* Overrides data in table and returns transaction receipt */
-            dynamic req_body = await GetBody (req.Body);
-            return ExecuteNonQuery (
-                String.Format (
-                    "UPDATE dbo.{0} SET {1} WHERE {2}", /* SQL Query to be executed */
-                    req.Query["table"],
-                    String.Join (
-                        DELIMITER,
-                        req_body.values.ToObject<string[]> ()
-                    ),
-                    req_body.condition
-                )
-            );
+            // /* Overrides data in table and returns transaction receipt */
+            // dynamic req_body = await GetBody (req.Body);
+            // return ExecuteNonQuery (
+            //     String.Format (
+            //         "UPDATE dbo.{0} SET {1} WHERE {2}", /* SQL Query to be executed */
+            //         req.Query["table"],
+            //         String.Join (
+            //             DELIMITER,
+            //             req_body.values.ToObject<string[]> ()
+            //         ),
+            //         req_body.condition
+            //     )
+            // );
+            return "to be implemented";
         }
 
         [FunctionName ("Delete")] /* API Endpoint: /api/delete?table=players */
         public static async Task<string> Delete ([HttpTrigger (AuthorizationLevel.Anonymous, "delete", Route = "delete")] HttpRequest req) {
 
-            /* Removes data in table and returns transaction receipt */
-            dynamic req_body = await GetBody (req.Body);
-            return ExecuteNonQuery (
-                String.Format (
-                    "DELETE FROM dbo.{0} WHERE {1}", /* SQL Query to be executed */
-                    req.Query["table"],
-                    req_body.condition
-                )
-            );
+            // /* Removes data in table and returns transaction receipt */
+            // dynamic req_body = await GetBody (req.Body);
+            // return ExecuteNonQuery (
+            //     String.Format (
+            //         "DELETE FROM dbo.{0} WHERE {1}", /* SQL Query to be executed */
+            //         req.Query["table"],
+            //         req_body.condition
+            //     )
+            // );
+            return "to be implemented";
         }
 
         /* Helper Functions */
@@ -189,99 +185,6 @@ namespace BitNaughts {
         /* Abstracting SQL Values to string array  */
         public static string WrapValues (string[] values) {
             return "(" + String.Join (DELIMITER, values) + ")";
-        }
-
-        /* Manages database connection, runs queries, and returns results */
-        public static string ExecuteQuery (string[] queries) {
-            string result = "";
-            foreach (string query in queries) {
-                result += ExecuteQuery (query) + "\n";
-            }
-            return result;
-        }
-        public static string ExecuteQuery (string query) {
-            try {
-                /* Defines connection parameters and query logic */
-                using (SqlConnection connection = new SqlConnection (System.Environment.GetEnvironmentVariable ("Connection String"))) {
-                    using (SqlCommand command = new SqlCommand (query, connection)) {
-
-                        /* Connects to database and executes query */
-                        connection.Open ();
-                        using (SqlDataReader reader = command.ExecuteReader ()) {
-
-                            /* Holds row results as they are read */
-                            List<string> results = new List<string> ();
-                            while (reader.Read ()) {
-
-                                /* Dumps values into Object array */
-                                Object[] fields = new Object[reader.FieldCount];
-                                reader.GetValues (fields);
-
-                                /* Adds row result as delimiter-seperated values */
-                                results.Add (
-                                    String.Join (
-                                        DELIMITER,
-                                        fields.Where (x => x != null)
-                                        .Select (x => x.ToString ())
-                                        .ToArray ()
-                                    )
-                                );
-                            }
-
-                            /* Closes the database connection */
-                            reader.Close ();
-                            connection.Close ();
-
-                            /* Returns formatted results from query */
-                            return String.Join (
-                                NEW_LINE,
-                                results.ToArray ()
-                            );
-                        }
-                    }
-                }
-            } catch (Exception ex) {
-                return String.Format (
-                    "Error({0}): {1}",
-                    query.Length > 50 ? query.Substring (0, 50) + "..." : query,
-                    ex.ToString ()
-                );
-            }
-        }
-
-        /* Manages database connection, runs commands, and returns receipts */
-        public static string ExecuteNonQuery (string[] queries) {
-            string result = "";
-            foreach (string query in queries) {
-                result += ExecuteNonQuery (query) + "\n";
-            }
-            return result;
-        }
-        public static string ExecuteNonQuery (string query) {
-            try {
-                /* Defines connection parameters and query logic */
-                using (SqlConnection connection = new SqlConnection (System.Environment.GetEnvironmentVariable ("Connection String"))) {
-                    using (SqlCommand command = new SqlCommand (query, connection)) {
-
-                        /* Connects to database and executes non-query */
-                        connection.Open ();
-                        int rows_modified = command.ExecuteNonQuery ();
-
-                        /* Returns number of rows modified */
-                        return String.Format (
-                            "Query({0}): {1} Row(s) Modified",
-                            query.Length > 50 ? query.Substring (0, 50) + "..." : query,
-                            rows_modified
-                        );
-                    }
-                }
-            } catch (Exception ex) {
-                return String.Format (
-                    "Error({0}): {1}",
-                    query.Length > 50 ? query.Substring (0, 50) + "..." : query,
-                    ex.ToString ()
-                );
-            };
         }
     }
 }
