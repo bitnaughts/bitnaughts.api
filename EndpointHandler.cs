@@ -91,8 +91,8 @@ namespace BitNaughts {
                                 "DELETE FROM dbo.Planets",
                                 "DELETE FROM dbo.Asteroids",
                                 /* Cleaning Relation Tables */
-                                "DELETE FROM dbo.SystemConnections",
                                 "DELETE FROM dbo.SystemLinks",
+                                "DELETE FROM dbo.SystemConnections",
                                 "DELETE FROM dbo.PlanetLinks",
                                 "DELETE FROM dbo.AsteroidLinks",
                                 /* Populating Entity Tables */
@@ -101,8 +101,8 @@ namespace BitNaughts {
                                 "INSERT INTO dbo.Planets VALUES" + String.Join (DELIMITER, planet_values.ToArray ()),
                                 "INSERT INTO dbo.Asteroids VALUES" + String.Join (DELIMITER, asteroid_values.ToArray ()),
                                 /* Populating Relation Tables */
-                                "INSERT INTO dbo.SystemConnections VALUES" + system_connection_values,
-                                "INSERT INTO dbo.SystemLinks VALUES" + String.Join (DELIMITER, system_link_values.ToArray ()),
+                                "INSERT INTO dbo.SystemLinks VALUES" + system_link_values,
+                                "INSERT INTO dbo.SystemConnections VALUES" + String.Join (DELIMITER, system_connection_values.ToArray ()),
                                 "INSERT INTO dbo.PlanetLinks VALUES" + String.Join (DELIMITER, planet_link_values.ToArray ()),
                                 "INSERT INTO dbo.AsteroidLinks VALUES" + String.Join (DELIMITER, asteroid_link_values.ToArray ())
                             }
