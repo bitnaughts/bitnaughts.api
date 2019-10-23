@@ -58,7 +58,7 @@ namespace BitNaughts {
                         foreach (dynamic system in galaxy.systems) {
                             values[SQLHandler.SYSTEM_CONNECTIONS].Add (String.Join (DELIMITER, ((IEnumerable<dynamic>) system.connected_systems).Select (
                                 connected_system => WrapValues (new string[] {
-                                    galaxy.id, system.id, connected_system
+                                    system.id, connected_system
                                 })
                             )));
                             values[SQLHandler.PLANETS].Add (String.Join (DELIMITER, ((IEnumerable<dynamic>) system.planets).Select (

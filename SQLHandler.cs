@@ -31,6 +31,7 @@ public static class SQLHandler {
     /* MS SQL has been shown to perform best when inserting groups of 25 values at a time. See https://www.red-gate.com/simple-talk/sql/performance/comparing-multiple-rows-insert-vs-single-row-insert-with-three-data-load-methods/ */
     public const int INSERT_BATCH_SIZE = 25;
 
+    /*  */
     public static string DeleteFrom (Dictionary<string, string> values) {
         string receipt = "";
         foreach (KeyValuePair<string, string> value in values) {
@@ -80,7 +81,7 @@ public static class SQLHandler {
     public static string ExecuteQuery (string[] queries) {
         string result = "";
         foreach (string query in queries) {
-            result += ExecuteQuery (query) + "\n";
+            result += ExecuteQuery (query);
         }
         return result;
     }
@@ -109,7 +110,7 @@ public static class SQLHandler {
                                     fields.Where (x => x != null)
                                     .Select (x => x.ToString ())
                                     .ToArray ()
-                                )
+                                ) + "\n"
                             );
                         }
 
@@ -127,7 +128,7 @@ public static class SQLHandler {
             }
         } catch (Exception ex) {
             return String.Format (
-                "Error({0}): {1}",
+                "Error({0}): {1}\n",
                 query.Length > 50 ? query.Substring (0, 50) + "..." : query,
                 ex.ToString ()
             );
@@ -138,7 +139,7 @@ public static class SQLHandler {
     public static string ExecuteNonQuery (string[] queries) {
         string result = "";
         foreach (string query in queries) {
-            result += ExecuteNonQuery (query) + "\n";
+            result += ExecuteNonQuery (query);
         }
         return result;
     }
@@ -154,7 +155,7 @@ public static class SQLHandler {
 
                     /* Returns number of rows modified */
                     return String.Format (
-                        "Query({0}): {1} Row(s) Modified",
+                        "Query({0}): {1} Row(s) Modified\n",
                         query.Length > 50 ? query.Substring (0, 50) + "..." : query,
                         rows_modified
                     );
@@ -162,7 +163,7 @@ public static class SQLHandler {
             }
         } catch (Exception ex) {
             return String.Format (
-                "Error({0}): {1}",
+                "Error({0}): {1}\n",
                 query.Length > 50 ? query.Substring (0, 50) + "..." : query,
                 ex.ToString ()
             );
