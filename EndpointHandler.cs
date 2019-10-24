@@ -30,7 +30,6 @@ namespace BitNaughts {
             TYPE = "type", //These constants should be consolidated into a shared class between the front and back ends...
             ID = "id"; //These constants should be consolidated into a shared class between the front and back ends...
 
-
         /* Class Types */
         public const string GALAXY_OBJECT = "GalaxyObject";
 
@@ -109,33 +108,27 @@ namespace BitNaughts {
                 /* Returns formatted result of selection query */
                 switch (req.Query[TYPE]) {
                     case GALAXY_OBJECT:
-                        return SQLHandler.Select(new Dictionary<string, string>{
-                            {SQLHandler.COLUMNS, SQLHandler.ALL},
-                            {SQLHandler.TABLE, SQLHandler.GALAXIES},
-                            {SQLHandler.CONDITION, "g_galaxy_id = " + req.Query[ID]} //We will want constants class abstract for this sort of class of wanting Galaxies' "g_galaxy_id" wrapped 
-                        });
-                        // string id = req.Query[ID];
-                        // 
-                }
 
-            //             dynamic req_body = await GetBody (req.Body);
-            //             return ExecuteQuery (
-            //                 String.Format (
-            //                     "SELECT {1} FROM dbo.{0} WHERE {2}", /* SQL Query to be executed */
-            //                     req.Query["table"],
-            //                     String.Join (
-            //                         DELIMITER,
-            //                         req_body.values.ToObject<string[]> ()
-            //                     ),
-            //                     req_body.condition
-            //                 )
-            //             );
-            //         case "fun-facts":
-            //             return ExecuteQuery (
-            //                 "To be determined... complex, fun facts sort of queries to satisfy requirements for DB project"
-            //             );
-            //     }
-            //     return "Flag not set...";
+                        // string galaxy_serialized = 
+                        
+                        SQLHandler.Select (new Dictionary<string, string> { { SQLHandler.COLUMNS, SQLHandler.ALL },
+                            { SQLHandler.TABLE, SQLHandler.GALAXIES },
+                            { SQLHandler.CONDITION, "g_galaxy_id = " + req.Query[ID] } //We will want constants class abstract for this sort of class of wanting Galaxies' "g_galaxy_id" wrapped 
+                        });
+                        
+                        
+                        
+                        //Will also likely want 
+                        //All System's position_x, position_y
+                        //All Systems' links
+
+                        return String.Format ("{id:1, seed:99, systems: { id:1, seed:99, connected_systems: {1, 2, 3, 4}, position_x: 123, position_y: 234 } }");
+                    case "fun-facts":
+                        return "to be implemented";
+                        // return ExecuteQuery (
+                            // "To be determined... complex, fun facts sort of queries to satisfy requirements for DB project"
+                        // );
+                }
             } catch (Exception ex) {
                 return ex.ToString ();
             }
@@ -190,5 +183,10 @@ namespace BitNaughts {
         public static string WrapValues (string[] values) {
             return "(" + String.Join (DELIMITER, values) + ")";
         }
+
+        public static string JSONify (string[] values) {
+            return "(" + String.Join (DELIMITER, values) + ")";
+        }
+
     }
 }
