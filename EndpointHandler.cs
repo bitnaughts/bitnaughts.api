@@ -16,14 +16,6 @@ namespace BitNaughts {
         public const string DELIMITER = ",",
             NEW_LINE = "\n";
 
-        /* Endpoints */
-        public const string GET = "get",
-            SET = "set";
-
-        /* Operation Types */
-        public const string HTTP_GET = "get",
-            HTTP_POST = "post";
-
         /* Endpoint Constants (Also see DatabaseHandler.cs) */
         public const string FLAG = "flag", //These constants should be consolidated into a shared class between the front and back ends...
             RESET = "reset", //These constants should be consolidated into a shared class between the front and back ends...
@@ -35,8 +27,8 @@ namespace BitNaughts {
 
         /* Endpoint Functions */
         /* * * * * * * * * * */
-        [FunctionName (SET)] /* API Endpoints: /api/set?flag=reset, /api/set?flag=add&table=players */
-        public static async Task<string> Set ([HttpTrigger (AuthorizationLevel.Anonymous, HTTP_POST, Route = SET)] HttpRequest req) {
+        [FunctionName (Endpoints.SET)] /* API Endpoints: /api/set?flag=reset, /api/set?flag=add&table=players */
+        public static async Task<string> Set ([HttpTrigger (AuthorizationLevel.Anonymous, HTTP.POST, Route = Endpoints.SET)] HttpRequest req) {
             try {
                 /* Reads data into table and returns transaction receipt */
                 switch (req.Query[FLAG]) {
@@ -50,10 +42,7 @@ namespace BitNaughts {
                             { SQLHandler.SYSTEMS, new List<string> () },
                             { SQLHandler.PLANETS, new List<string> () },
                             { SQLHandler.ASTEROIDS, new List<string> () },
-                            { SQLHandler.SYSTEM_CONNECTIONS, new List<string> () },
-                            { SQLHandler.SYSTEM_LINKS, new List<string> () },
-                            { SQLHandler.PLANET_LINKS, new List<string> () },
-                            { SQLHandler.ASTEROID_LINKS, new List<string> () }
+                            { SQLHandler.SYSTEM_CONNECTIONS, new List<string> () }
                         };
 
                         /* Agregrates Table Values */
@@ -62,10 +51,7 @@ namespace BitNaughts {
                         }));
                         foreach (dynamic system in galaxy.systems) {
                             values[SQLHandler.SYSTEMS].Add (WrapValues (new string[] {
-                                system.id, system.seed, system.position_x, system.position_y
-                            }));
-                            values[SQLHandler.SYSTEM_LINKS].Add (WrapValues (new string[] {
-                                galaxy.id, system.id
+                                system.id, galaxy.id, system.seed, system.position_x, system.position_y
                             }));
                             values[SQLHandler.SYSTEM_CONNECTIONS].AddRange (((IEnumerable<dynamic>) system.connected_systems).Select (
                                 connected_system => WrapValues (new string[] {
@@ -74,22 +60,12 @@ namespace BitNaughts {
                             ));
                             values[SQLHandler.PLANETS].AddRange (((IEnumerable<dynamic>) system.planets).Select (
                                 planet => WrapValues (new string[] {
-                                    planet.id, planet.seed
-                                })
-                            ));
-                            values[SQLHandler.PLANET_LINKS].AddRange (((IEnumerable<dynamic>) system.planets).Select (
-                                planet => WrapValues (new string[] {
-                                    system.id, planet.id
+                                    planet.id, system.id, planet.seed
                                 })
                             ));
                             values[SQLHandler.ASTEROIDS].AddRange (((IEnumerable<dynamic>) system.asteroids).Select (
                                 asteroid => WrapValues (new string[] {
-                                    asteroid.id, asteroid.seed, asteroid.size
-                                })
-                            ));
-                            values[SQLHandler.ASTEROID_LINKS].AddRange (((IEnumerable<dynamic>) system.asteroids).Select (
-                                asteroid => WrapValues (new string[] {
-                                    system.id, asteroid.id
+                                    asteroid.id, system.id, asteroid.seed, asteroid.size
                                 })
                             ));
                         }
@@ -99,11 +75,11 @@ namespace BitNaughts {
             } catch (Exception ex) {
                 return ex.ToString ();
             }
-            return "NULL?";
+            return new InvalidOperationException().ToString();
         }
 
-        [FunctionName (GET)] /* API Endpoint: /api/get?table=players&fields=* */
-        public static async Task<string> Get ([HttpTrigger (AuthorizationLevel.Anonymous, HTTP_GET, Route = GET)] HttpRequest req) {
+        [FunctionName (Endpoints.GET)] /* API Endpoint: /api/get?table=players&fields=* */
+        public static async Task<string> Get ([HttpTrigger (AuthorizationLevel.Anonymous, HTTP.GET, Route = Endpoints.GET)] HttpRequest req) {
             try {
                 /* Returns formatted result of selection query */
                 switch (req.Query[TYPE]) {
@@ -132,11 +108,11 @@ namespace BitNaughts {
             } catch (Exception ex) {
                 return ex.ToString ();
             }
-            return "to be implemented";
+            return new InvalidOperationException().ToString();
         }
 
-        [FunctionName ("Update")] /* API Endpoint: /api/update?table=players */
-        public static async Task<string> Update ([HttpTrigger (AuthorizationLevel.Anonymous, "put", Route = "update")] HttpRequest req) {
+        [FunctionName (Endpoints.UPDATE)] /* API Endpoint: /api/update?table=players */
+        public static async Task<string> Update ([HttpTrigger (AuthorizationLevel.Anonymous, HTTP.PUT, Route = Endpoints.UPDATE)] HttpRequest req) {
 
             // /* Overrides data in table and returns transaction receipt */
             // dynamic req_body = await GetBody (req.Body);
@@ -151,7 +127,7 @@ namespace BitNaughts {
             //         req_body.condition
             //     )
             // );
-            return "to be implemented";
+            return new InvalidOperationException().ToString();
         }
 
         [FunctionName ("Delete")] /* API Endpoint: /api/delete?table=players */
@@ -166,7 +142,19 @@ namespace BitNaughts {
             //         req_body.condition
             //     )
             // );
-            return "to be implemented";
+            return new InvalidOperationException().ToString();
+        }
+
+        [FunctionName (Endpoints.RESET)] /* API Endpoint: /api/reset */
+        public static async Task<string> Reset ([HttpTrigger (AuthorizationLevel.Anonymous, HTTP.GET, Route = Endpoints.RESET)] HttpRequest req) {
+            try {
+                /* Force drops all existing tables and regenerates them per the Constructor/*.sql definitions */
+                // foreach...
+
+            } catch (Exception ex) {
+                return ex.ToString ();
+            }
+            return new InvalidOperationException().ToString();
         }
 
         /* Helper Functions */
