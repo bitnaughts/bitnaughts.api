@@ -20,15 +20,8 @@ public static class SQLHandler {
         ALL = "*";
 
     /* TABLE NAMES */
-    public const string TABLE = "table",
-        GALAXIES = "dbo.Galaxies",
-        SYSTEMS = "dbo.Systems",
-        SYSTEM_LINKS = "dbo.SystemLinks",
-        SYSTEM_CONNECTIONS = "dbo.SystemConnections",
-        PLANETS = "dbo.Planets",
-        PLANET_LINKS = "dbo.PlanetLinks",
-        ASTEROIDS = "dbo.Asteroids",
-        ASTEROID_LINKS = "dbo.AsteroidLinks";
+    // public const string TABLE = "table",
+        
 
     public const string CONDITION = "condition";
 

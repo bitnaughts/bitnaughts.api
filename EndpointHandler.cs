@@ -12,18 +12,6 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 namespace BitNaughts {
     public static class EndpointHandler {
 
-        /* Result-formatting constants */
-
-
-        /* Endpoint Constants (Also see DatabaseHandler.cs) */
-        public const string FLAG = "flag", //These constants should be consolidated into a shared class between the front and back ends...
-            RESET = "reset", //These constants should be consolidated into a shared class between the front and back ends...
-            TYPE = "type", //These constants should be consolidated into a shared class between the front and back ends...
-            ID = "id"; //These constants should be consolidated into a shared class between the front and back ends...
-
-        /* Class Types */
-        public const string GALAXY_OBJECT = "GalaxyObject";
-
         /* Endpoint Functions */
         /* * * * * * * * * * */
         [FunctionName (Endpoints.SET)] /* API Endpoints: /api/set?flag=reset, /api/set?flag=add&table=players */
@@ -37,11 +25,11 @@ namespace BitNaughts {
                         dynamic galaxy = await GetBody (req.Body);
 
                         /* Initializing Table Values */
-                        Dictionary<string, List<string>> values = new Dictionary<string, List<string>> { { SQLHandler.GALAXIES, new List<string> () },
-                            { SQLHandler.SYSTEMS, new List<string> () },
-                            { SQLHandler.PLANETS, new List<string> () },
-                            { SQLHandler.ASTEROIDS, new List<string> () },
-                            { SQLHandler.SYSTEM_CONNECTIONS, new List<string> () }
+                        Dictionary<string, List<string>> values = new Dictionary<string, List<string>> { { Database.TableNames.GALAXIES, new List<string> () },
+                            { Database.TableNames.SYSTEMS, new List<string> () },
+                            { Database.TableNames.PLANETS, new List<string> () },
+                            { Database.TableNames.ASTEROIDS, new List<string> () },
+                            { Database.TableNames.SYSTEM_CONNECTIONS, new List<string> () }
                         };
 
                         /* Agregrates Table Values */
@@ -87,8 +75,8 @@ namespace BitNaughts {
                         // string galaxy_serialized = 
 
                         SQLHandler.Select (new Dictionary<string, string> { { SQLHandler.COLUMNS, SQLHandler.ALL },
-                            { SQLHandler.TABLE, SQLHandler.GALAXIES },
-                            { SQLHandler.CONDITION, "g_galaxy_id = " + req.Query[ID] } //We will want constants class abstract for this sort of class of wanting Galaxies' "g_galaxy_id" wrapped 
+                            { SQLHandler.TABLE, Database.TableNames.GALAXIES },
+                            { SQLHandler.CONDITION, Database.Tables.Galaxies.ID + " = " + req.Query[ID] } //We will want constants class abstract for this sort of class of wanting Galaxies' "g_galaxy_id" wrapped 
                         });
 
                         //Will also likely want 
@@ -146,28 +134,28 @@ namespace BitNaughts {
         public static async Task<string> Reset ([HttpTrigger (AuthorizationLevel.Anonymous, HTTP.GET, Route = Endpoints.RESET)] HttpRequest req) {
             try {
                 /* Force drops all existing tables and regenerates them per the Constructor/*.sql definitions */
-                List<string> tables = new List<string>();
-                List<string> tables_data = new List<string>();
+                List<string> tables = new List<string> ();
+                List<string> tables_data = new List<string> ();
 
-                foreach (string sql_table_path in SQLHandler.GetSQLTableDefinitions()) {
-                    
+                foreach (string sql_table_path in SQLHandler.GetSQLTableDefinitions ()) {
+
                     /* Isolates table name from table path and adding to list */
-                    tables.Add(
-                        sql_table_path.Substring(
-                            Math.Max(
-                                sql_table_path.LastIndexOf("/"),
-                                sql_table_path.LastIndexOf("\\")
+                    tables.Add (
+                        sql_table_path.Substring (
+                            Math.Max (
+                                sql_table_path.LastIndexOf ("/"),
+                                sql_table_path.LastIndexOf ("\\")
                             ) + 1
-                        ).Split(new string[] {".sql"}, StringSplitOptions.None)[0]
+                        ).Split (new string[] { FileFormat.SQL_FILE_TYPE }, StringSplitOptions.None) [0]
                     );
 
                     /* Reads table files' content into list */
-                    tables_data.Add(
+                    tables_data.Add (
                         File.ReadAllText (sql_table_path)
                     );
                 }
                 /* Drops old tables and creates new ones with updated fields */
-                return SQLHandler.Drop(tables) + SQLHandler.Create(tables_data);
+                return SQLHandler.Drop (tables) + SQLHandler.Create (tables_data);
 
             } catch (Exception ex) {
                 return ex.ToString ();
@@ -189,10 +177,5 @@ namespace BitNaughts {
         public static string WrapValues (string[] values) {
             return "(" + String.Join (FileFormat.DELIMITER, values) + ")";
         }
-
-        public static string JSONify (string[] values) {
-            return "(" + String.Join (FileFormat.DELIMITER, values) + ")";
-        }
-
     }
 }

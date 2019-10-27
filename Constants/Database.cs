@@ -1,5 +1,12 @@
 public static class Database {
     public const string NAME = "bitnaughtsdb";
+    public static class TableNames {
+        public const string GALAXIES = "dbo.Galaxies",
+            SYSTEMS = "dbo.Systems",
+            SYSTEM_CONNECTIONS = "dbo.SystemConnections",
+            PLANETS = "dbo.Planets",
+            ASTEROIDS = "dbo.Asteroids";
+    }
     public static class Tables {
         public static class Galaxies {
             public const string ID = "g_galaxy_id",
