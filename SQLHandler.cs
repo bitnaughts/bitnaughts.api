@@ -15,25 +15,14 @@ public static class SQLHandler {
     public const string DELIMITER = ",",
         NEW_LINE = "\n";
 
-    /* Common conditions */
-    public const string COLUMNS = "columns",
-        ALL = "*";
 
-    /* TABLE NAMES */
-    // public const string TABLE = "table",
-        
-
-    public const string CONDITION = "condition";
-
-    /* MS SQL has been shown to perform best when inserting groups of 25 values at a time. See https://www.red-gate.com/simple-talk/sql/performance/comparing-multiple-rows-insert-vs-single-row-insert-with-three-data-load-methods/ */
-    public const int INSERT_BATCH_SIZE = 25;
 
     public static string Select (Dictionary<string, string> parameters) {
         return ExecuteQuery (String.Format (
             "SELECT {1} FROM {0} WHERE {2}", /* SQL Query to be executed */
-            parameters[TABLE],
-            parameters[COLUMNS],
-            parameters[CONDITION]
+            parameters[SQL.TABLE],
+            parameters[SQL.COLUMNS],
+            parameters[SQL.CONDITION]
         ));
     }
 
@@ -44,7 +33,7 @@ public static class SQLHandler {
             String.Join (DELIMITER, new List<string> (values.Keys).ToArray ())
         );
         foreach (KeyValuePair<string, string> value in values) {
-            receipt += (value.Value == ALL) ?
+            receipt += (value.Value == SQL.ALL) ?
                 ExecuteNonQuery (String.Format (
                     "DELETE FROM {0}", /* SQL Query to be executed when no condition is specified*/
                     value.Key
@@ -111,11 +100,11 @@ public static class SQLHandler {
             receipt += ExecuteNonQuery (String.Format (
                 "INSERT INTO {0} VALUES {1}", /* SQL Query to be executed */
                 table,
-                String.Join (DELIMITER, values.Skip (batch_index).Take (INSERT_BATCH_SIZE).ToArray ())
+                String.Join (DELIMITER, values.Skip (batch_index).Take (SQL.INSERT_BATCH_SIZE).ToArray ())
             ));
 
             /* Keeping track of how many values have been added */
-            batch_index += INSERT_BATCH_SIZE;
+            batch_index += SQL.INSERT_BATCH_SIZE;
         }
         return receipt;
     }

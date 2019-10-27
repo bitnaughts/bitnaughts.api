@@ -56,7 +56,7 @@ namespace BitNaughts {
                                 })
                             ));
                         }
-                        return SQLHandler.Delete (values.ToDictionary (value => value.Key, value => SQLHandler.ALL)) + /* For every table referenced, clear all existing values */
+                        return SQLHandler.Delete (values.ToDictionary (value => value.Key, value => SQL.ALL)) + /* For every table referenced, clear all existing values */
                             SQLHandler.Insert (values); /* For every table referenced, inject values */
                 }
             } catch (Exception ex) {
