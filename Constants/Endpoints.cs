@@ -6,9 +6,13 @@ public static class Endpoints {
 
     public static class Parameters {
         public const string FLAG = "flag",
-            RESET = "reset",
             TYPE = "type",
             ID = "id";
+        public static class Values {
+            public const string RESET = "reset",
+                TYPE = "type",
+                ID = "id";
+        }
     }
 
 }

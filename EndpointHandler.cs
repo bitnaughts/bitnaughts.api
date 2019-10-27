@@ -18,8 +18,8 @@ namespace BitNaughts {
         public static async Task<string> Set ([HttpTrigger (AuthorizationLevel.Anonymous, HTTP.POST, Route = Endpoints.SET)] HttpRequest req) {
             try {
                 /* Reads data into table and returns transaction receipt */
-                switch (req.Query[FLAG]) {
-                    case RESET:
+                switch (req.Query[Endpoints.Parameters.FLAG]) {
+                    case Endpoints.Parameters.Values.RESET:
 
                         /* Pulls galaxy JSON from HTTP Body */
                         dynamic galaxy = await GetBody (req.Body);
@@ -27,30 +27,30 @@ namespace BitNaughts {
                         /* Initializing Table Values */
                         Dictionary<string, List<string>> values = new Dictionary<string, List<string>> { { Database.TableNames.GALAXIES, new List<string> () },
                             { Database.TableNames.SYSTEMS, new List<string> () },
+                            { Database.TableNames.SYSTEM_CONNECTIONS, new List<string> () },
                             { Database.TableNames.PLANETS, new List<string> () },
-                            { Database.TableNames.ASTEROIDS, new List<string> () },
-                            { Database.TableNames.SYSTEM_CONNECTIONS, new List<string> () }
+                            { Database.TableNames.ASTEROIDS, new List<string> () }
                         };
 
                         /* Agregrates Table Values */
-                        values[SQLHandler.GALAXIES].Add (WrapValues (new string[] {
+                        values[Database.TableNames.GALAXIES].Add (WrapValues (new string[] {
                             galaxy.id, galaxy.seed
                         }));
                         foreach (dynamic system in galaxy.systems) {
-                            values[SQLHandler.SYSTEMS].Add (WrapValues (new string[] {
+                            values[Database.TableNames.SYSTEMS].Add (WrapValues (new string[] {
                                 system.id, galaxy.id, system.seed, system.position_x, system.position_y
                             }));
-                            values[SQLHandler.SYSTEM_CONNECTIONS].AddRange (((IEnumerable<dynamic>) system.connected_systems).Select (
+                            values[Database.TableNames.SYSTEM_CONNECTIONS].AddRange (((IEnumerable<dynamic>) system.connected_systems).Select (
                                 connected_system => WrapValues (new string[] {
                                     system.id, connected_system
                                 })
                             ));
-                            values[SQLHandler.PLANETS].AddRange (((IEnumerable<dynamic>) system.planets).Select (
+                            values[Database.TableNames.PLANETS].AddRange (((IEnumerable<dynamic>) system.planets).Select (
                                 planet => WrapValues (new string[] {
                                     planet.id, system.id, planet.seed
                                 })
                             ));
-                            values[SQLHandler.ASTEROIDS].AddRange (((IEnumerable<dynamic>) system.asteroids).Select (
+                            values[Database.TableNames.ASTEROIDS].AddRange (((IEnumerable<dynamic>) system.asteroids).Select (
                                 asteroid => WrapValues (new string[] {
                                     asteroid.id, system.id, asteroid.seed, asteroid.size
                                 })
@@ -69,14 +69,19 @@ namespace BitNaughts {
         public static async Task<string> Get ([HttpTrigger (AuthorizationLevel.Anonymous, HTTP.GET, Route = Endpoints.GET)] HttpRequest req) {
             try {
                 /* Returns formatted result of selection query */
-                switch (req.Query[TYPE]) {
-                    case GALAXY_OBJECT:
+
+
+                string type = req.Query[Endpoints.Parameters.TYPE];
+                string id = req.Query[Endpoints.Parameters.ID];
+
+                switch (type) {
+                    case Database.TableNames.GALAXIES:
 
                         // string galaxy_serialized = 
 
-                        SQLHandler.Select (new Dictionary<string, string> { { SQLHandler.COLUMNS, SQLHandler.ALL },
-                            { SQLHandler.TABLE, Database.TableNames.GALAXIES },
-                            { SQLHandler.CONDITION, Database.Tables.Galaxies.ID + " = " + req.Query[ID] } //We will want constants class abstract for this sort of class of wanting Galaxies' "g_galaxy_id" wrapped 
+                        SQLHandler.Select (new Dictionary<string, string> { { SQL.COLUMNS, SQL.ALL },
+                            { SQL.TABLE, Database.TableNames.GALAXIES },
+                            { SQL.CONDITION, Database.Tables.Galaxies.ID + SQL.EQUALS + id }
                         });
 
                         //Will also likely want 
