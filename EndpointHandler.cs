@@ -70,7 +70,6 @@ namespace BitNaughts {
             try {
                 /* Returns formatted result of selection query */
 
-
                 string type = req.Query[Endpoints.Parameters.TYPE];
                 string id = req.Query[Endpoints.Parameters.ID];
 
@@ -136,13 +135,17 @@ namespace BitNaughts {
         }
 
         [FunctionName (Endpoints.RESET)] /* API Endpoint: /api/reset */
-        public static async Task<string> Reset ([HttpTrigger (AuthorizationLevel.Anonymous, HTTP.GET, Route = Endpoints.RESET)] HttpRequest req) {
+        public static async Task<string> Reset ([HttpTrigger (AuthorizationLevel.Anonymous, HTTP.GET, Route = Endpoints.RESET)] HttpRequest req, ExecutionContext ctx) {
             try {
                 /* Force drops all existing tables and regenerates them per the Constructor/*.sql definitions */
                 List<string> tables = new List<string> ();
                 List<string> tables_data = new List<string> ();
 
-                foreach (string sql_table_path in SQLHandler.GetSQLTableDefinitions ()) {
+                foreach (string sql_table_path in SQLHandler.GetSQLTableDefinitions (
+                        Path.Combine (
+                            ctx.FunctionAppDirectory,
+                            FileFormat.CONSTRUCTORS_FOLDER)
+                    )) {
 
                     /* Isolates table name from table path and adding to list */
                     tables.Add (

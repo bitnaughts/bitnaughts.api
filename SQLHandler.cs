@@ -202,7 +202,7 @@ public static class SQLHandler {
         }
     }
 
-    public static IEnumerable<string> GetSQLTableDefinitions() {
-        return Directory.EnumerateFiles (FileFormat.CONSTRUCTORS_FOLDER, FileFormat.SQL_FILES);
+    public static IEnumerable<string> GetSQLTableDefinitions(string folder_path) {
+        return Directory.EnumerateFiles (folder_path, FileFormat.SQL_FILES);
     }
 }
