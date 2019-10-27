@@ -19,11 +19,17 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Constructors\" />
+    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Handlers\" />
+    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Constants\" />
+    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
   </ItemGroup>
 </Project>
