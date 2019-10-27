@@ -18,18 +18,12 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Constructors\" />
-    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    <Folder Update="Constructors\"  CopyToPublishDirectory="Always" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Handlers\" />
-    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    <Folder Update="Handlers\" CopyToPublishDirectory="Always"  />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Constants\" />
-    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    <Folder Update="Constants\" CopyToPublishDirectory="Always"  />
   </ItemGroup>
 </Project>
