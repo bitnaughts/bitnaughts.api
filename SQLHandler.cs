@@ -65,6 +65,33 @@ public static class SQLHandler {
         return receipt;
     }
 
+    public static string Drop(List<string> tables) {
+        string receipt = String.Format ("{0}: Dropping {1} tables\n",
+            DateTime.Now.ToShortTimeString (),
+            tables.Count
+        );
+        foreach (string table in tables) {
+            receipt += ExecuteNonQuery(String.Format(
+                "DROP TABLE {0}",
+                table
+            ));
+        }
+        return receipt;
+    }    
+    public static string Create(List<string> tables_data) {
+        string receipt = String.Format ("{0}: Creating {1} tables\n",
+            DateTime.Now.ToShortTimeString (),
+            tables_data.Count
+        );
+        foreach (string table_data in tables_data) {
+            receipt += ExecuteNonQuery(
+                table_data
+            );
+        }
+        return receipt;
+    }
+
+
     public static string Insert (Dictionary<string, List<string>> values) {
         string receipt = String.Format ("{0}: Adding {1} rows into Tables({2})\n",
             DateTime.Now.ToShortTimeString (),
@@ -191,5 +218,9 @@ public static class SQLHandler {
                 ex.ToString ()
             );
         }
+    }
+
+    public static IEnumerable<string> GetSQLTableDefinitions() {
+        return Directory.EnumerateFiles (FileFormat.CONSTRUCTORS_FOLDER, FileFormat.SQL_FILES);
     }
 }
