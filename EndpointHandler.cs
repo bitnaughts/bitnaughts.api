@@ -13,8 +13,7 @@ namespace BitNaughts {
     public static class EndpointHandler {
 
         /* Result-formatting constants */
-        public const string DELIMITER = ",",
-            NEW_LINE = "\n";
+
 
         /* Endpoint Constants (Also see DatabaseHandler.cs) */
         public const string FLAG = "flag", //These constants should be consolidated into a shared class between the front and back ends...
@@ -75,7 +74,7 @@ namespace BitNaughts {
             } catch (Exception ex) {
                 return ex.ToString ();
             }
-            return new InvalidOperationException().ToString();
+            return new InvalidOperationException ().ToString ();
         }
 
         [FunctionName (Endpoints.GET)] /* API Endpoint: /api/get?table=players&fields=* */
@@ -86,14 +85,12 @@ namespace BitNaughts {
                     case GALAXY_OBJECT:
 
                         // string galaxy_serialized = 
-                        
+
                         SQLHandler.Select (new Dictionary<string, string> { { SQLHandler.COLUMNS, SQLHandler.ALL },
                             { SQLHandler.TABLE, SQLHandler.GALAXIES },
                             { SQLHandler.CONDITION, "g_galaxy_id = " + req.Query[ID] } //We will want constants class abstract for this sort of class of wanting Galaxies' "g_galaxy_id" wrapped 
                         });
-                        
-                        
-                        
+
                         //Will also likely want 
                         //All System's position_x, position_y
                         //All Systems' links
@@ -102,13 +99,13 @@ namespace BitNaughts {
                     case "fun-facts":
                         return "to be implemented";
                         // return ExecuteQuery (
-                            // "To be determined... complex, fun facts sort of queries to satisfy requirements for DB project"
+                        // "To be determined... complex, fun facts sort of queries to satisfy requirements for DB project"
                         // );
                 }
             } catch (Exception ex) {
                 return ex.ToString ();
             }
-            return new InvalidOperationException().ToString();
+            return new InvalidOperationException ().ToString ();
         }
 
         [FunctionName (Endpoints.UPDATE)] /* API Endpoint: /api/update?table=players */
@@ -121,13 +118,13 @@ namespace BitNaughts {
             //         "UPDATE dbo.{0} SET {1} WHERE {2}", /* SQL Query to be executed */
             //         req.Query["table"],
             //         String.Join (
-            //             DELIMITER,
+            //             FileFormat.DELIMITER,
             //             req_body.values.ToObject<string[]> ()
             //         ),
             //         req_body.condition
             //     )
             // );
-            return new InvalidOperationException().ToString();
+            return new InvalidOperationException ().ToString ();
         }
 
         [FunctionName ("Delete")] /* API Endpoint: /api/delete?table=players */
@@ -142,19 +139,40 @@ namespace BitNaughts {
             //         req_body.condition
             //     )
             // );
-            return new InvalidOperationException().ToString();
+            return new InvalidOperationException ().ToString ();
         }
 
         [FunctionName (Endpoints.RESET)] /* API Endpoint: /api/reset */
         public static async Task<string> Reset ([HttpTrigger (AuthorizationLevel.Anonymous, HTTP.GET, Route = Endpoints.RESET)] HttpRequest req) {
             try {
                 /* Force drops all existing tables and regenerates them per the Constructor/*.sql definitions */
-                // foreach...
+                List<string> tables = new List<string>();
+                List<string> tables_data = new List<string>();
+
+                foreach (string sql_table_path in SQLHandler.GetSQLTableDefinitions()) {
+                    
+                    /* Isolates table name from table path and adding to list */
+                    tables.Add(
+                        sql_table_path.Substring(
+                            Math.Max(
+                                sql_table_path.LastIndexOf("/"),
+                                sql_table_path.LastIndexOf("\\")
+                            ) + 1
+                        ).Split(new string[] {".sql"}, StringSplitOptions.None)[0]
+                    );
+
+                    /* Reads table files' content into list */
+                    tables_data.Add(
+                        File.ReadAllText (sql_table_path)
+                    );
+                }
+                /* Drops old tables and creates new ones with updated fields */
+                return SQLHandler.Drop(tables) + SQLHandler.Create(tables_data);
 
             } catch (Exception ex) {
                 return ex.ToString ();
             }
-            return new InvalidOperationException().ToString();
+            return new InvalidOperationException ().ToString ();
         }
 
         /* Helper Functions */
@@ -169,11 +187,11 @@ namespace BitNaughts {
 
         /* Abstracting SQL Values to string array  */
         public static string WrapValues (string[] values) {
-            return "(" + String.Join (DELIMITER, values) + ")";
+            return "(" + String.Join (FileFormat.DELIMITER, values) + ")";
         }
 
         public static string JSONify (string[] values) {
-            return "(" + String.Join (DELIMITER, values) + ")";
+            return "(" + String.Join (FileFormat.DELIMITER, values) + ")";
         }
 
     }
