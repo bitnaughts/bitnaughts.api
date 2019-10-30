@@ -1,5 +1,15 @@
 public static class SQL {
-    
+    public static class Format {
+        /* CSV-like result output format */
+        public const string DELIMITER = ",",
+            NEW_LINE = "\n";
+
+        /* How explicit/verbose telemetry receipts are */
+        public const int MAX_CHARS_RETURED = 150;
+        public const string VOIDED_CHARS = "\n\r\t";
+
+        public const string SQL_FILES = "*.sql", SQL_FILE_TYPE = ".sql";
+    }
     /* Common conditions */
     public const string COLUMNS = "columns",
         ALL = "*";

@@ -183,7 +183,7 @@ namespace BitNaughts {
 
         /* Abstracting SQL Values to string array  */
         public static string WrapValues (string[] values) {
-            return "(" + String.Join (FileFormat.DELIMITER, values) + ")";
+            return "(" + String.Join (SQL.Format.DELIMITER, values) + ")";
         }
     }
 }
