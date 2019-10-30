@@ -46,8 +46,8 @@ public static class Database {
                     [p_size] INT NULL,
                     [p_density] INT NULL,
                     [p_composition] VARCHAR(20) NULL,
-                    [p_is_habitable] BOOL NULL,
-                    [p_is_inhabited] BOOL NULL,
+                    [p_is_habitable] BIT NULL,
+                    [p_is_inhabited] BIT NULL,
                     [p_kardashev_level] INT NULL,
                     [p_economy_type] VARCHAR(10) NULL,
                     [p_seed] INT NULL
@@ -76,8 +76,8 @@ public static class Database {
                     [a_size] INT NULL,
                     [a_density] INT NULL,
                     [a_composition] VARCHAR(20) NULL,
-                    [a_is_mineable] BOOLEAN NULL,
-                    [a_is_regenerating] BOOLEAN NULL,
+                    [a_is_mineable] BIT NULL,
+                    [a_is_regenerating] BIT NULL,
                     [a_seed] INT NULL
                 )",
                 TABLE_NAME = "dbo.Asteroids",
