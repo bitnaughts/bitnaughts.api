@@ -17,13 +17,4 @@
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Update="Constructors\"  CopyToPublishDirectory="Always" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Update="Handlers\" CopyToPublishDirectory="Always"  />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Update="Constants\" CopyToPublishDirectory="Always"  />
-  </ItemGroup>
 </Project>
