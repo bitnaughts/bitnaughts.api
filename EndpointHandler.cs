@@ -141,28 +141,28 @@ namespace BitNaughts {
                 return SQLHandler.Drop (
                     new string[] {
                         Database.Tables.Galaxies.TABLE_NAME,
-                        Database.Tables.Systems.TABLE_NAME,
-                        Database.Tables.SystemConnections.TABLE_NAME,
-                        Database.Tables.Planets.TABLE_NAME,
-                        Database.Tables.Asteroids.TABLE_NAME,
-                        Database.Tables.Ships.TABLE_NAME,
-                        Database.Tables.SessionHistory.TABLE_NAME,
-                        Database.Tables.CombatHistory.TABLE_NAME,
-                        Database.Tables.Mines.TABLE_NAME,
-                        Database.Tables.Visits.TABLE_NAME
+                            Database.Tables.Systems.TABLE_NAME,
+                            Database.Tables.SystemConnections.TABLE_NAME,
+                            Database.Tables.Planets.TABLE_NAME,
+                            Database.Tables.Asteroids.TABLE_NAME,
+                            Database.Tables.Ships.TABLE_NAME,
+                            Database.Tables.SessionHistory.TABLE_NAME,
+                            Database.Tables.CombatHistory.TABLE_NAME,
+                            Database.Tables.Mines.TABLE_NAME,
+                            Database.Tables.Visits.TABLE_NAME
                     }
                 ) + SQLHandler.Create (
                     new string[] {
                         Database.Tables.Galaxies.SQL_DEFINITION,
-                        Database.Tables.Systems.SQL_DEFINITION,
-                        Database.Tables.SystemConnections.SQL_DEFINITION,
-                        Database.Tables.Planets.SQL_DEFINITION,
-                        Database.Tables.Asteroids.SQL_DEFINITION,
-                        Database.Tables.Ships.SQL_DEFINITION,
-                        Database.Tables.SessionHistory.SQL_DEFINITION,
-                        Database.Tables.CombatHistory.SQL_DEFINITION,
-                        Database.Tables.Mines.SQL_DEFINITION,
-                        Database.Tables.Visits.SQL_DEFINITION
+                            Database.Tables.Systems.SQL_DEFINITION,
+                            Database.Tables.SystemConnections.SQL_DEFINITION,
+                            Database.Tables.Planets.SQL_DEFINITION,
+                            Database.Tables.Asteroids.SQL_DEFINITION,
+                            Database.Tables.Ships.SQL_DEFINITION,
+                            Database.Tables.SessionHistory.SQL_DEFINITION,
+                            Database.Tables.CombatHistory.SQL_DEFINITION,
+                            Database.Tables.Mines.SQL_DEFINITION,
+                            Database.Tables.Visits.SQL_DEFINITION
                     }
                 );
             } catch (Exception ex) {

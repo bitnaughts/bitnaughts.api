@@ -200,7 +200,7 @@ public static class SQLHandler {
         foreach (char curr_char in text) {
             if (output.Length == SQL.Format.MAX_CHARS_RETURED) return output + " ..."; /* Immediately returns when output is too long */
             else if (SQL.Format.VOIDED_CHARS.Contains (curr_char)) continue; /* Skips character if in illegal set */
-            else if (curr_char == ' ' && output.Last() == ' ') continue; /* Skips whitespace longer than length one */
+            else if (curr_char == ' ' && output.Last () == ' ') continue; /* Skips whitespace longer than length one */
             else output += curr_char; /* Appends valid character from original string */
         }
         return output;
