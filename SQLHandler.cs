@@ -11,12 +11,6 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 
 public static class SQLHandler {
 
-    /* Result-formatting constants */
-    public const string DELIMITER = ",",
-        NEW_LINE = "\n";
-
-
-
     public static string Select (Dictionary<string, string> parameters) {
         return ExecuteQuery (String.Format (
             "SELECT {1} FROM {0} WHERE {2}", /* SQL Query to be executed */
@@ -28,9 +22,9 @@ public static class SQLHandler {
 
     public static string Delete (Dictionary<string, string> values) {
         string receipt = String.Format ("{0}: Adding {1} rows into Tables({2})\n",
-            DateTime.Now.ToShortTimeString (),
+            GetRecepitDate(),
             values.Count,
-            String.Join (DELIMITER, new List<string> (values.Keys).ToArray ())
+            String.Join (SQL.Format.DELIMITER, new List<string> (values.Keys).ToArray ())
         );
         foreach (KeyValuePair<string, string> value in values) {
             receipt += (value.Value == SQL.ALL) ?
@@ -49,7 +43,7 @@ public static class SQLHandler {
 
     public static string Drop(string[] tables) {
         string receipt = String.Format ("{0}: Dropping {1} tables\n",
-            DateTime.Now.ToShortTimeString (),
+            GetRecepitDate(),
             tables.Length
         );
         foreach (string table in tables) {
@@ -62,7 +56,7 @@ public static class SQLHandler {
     }    
     public static string Create(string[] tables_data) {
         string receipt = String.Format ("{0}: Creating {1} tables\n",
-            DateTime.Now.ToShortTimeString (),
+            GetRecepitDate(),
             tables_data.Length
         );
         foreach (string table_data in tables_data) {
@@ -76,9 +70,9 @@ public static class SQLHandler {
 
     public static string Insert (Dictionary<string, List<string>> values) {
         string receipt = String.Format ("{0}: Adding {1} rows into Tables({2})\n",
-            DateTime.Now.ToShortTimeString (),
+            GetRecepitDate(),
             values.Count,
-            String.Join (DELIMITER, new List<string> (values.Keys).ToArray ())
+            String.Join (SQL.Format.DELIMITER, new List<string> (values.Keys).ToArray ())
         );
         foreach (KeyValuePair<string, List<string>> value in values) {
             receipt += Insert (value.Key, value.Value);
@@ -88,7 +82,7 @@ public static class SQLHandler {
 
     public static string Insert (string table, List<string> values) {
         string receipt = String.Format ("{0}: Adding {1} rows into {2}\n",
-            DateTime.Now.ToShortTimeString (),
+            GetRecepitDate(),
             values.Count,
             table
         );
@@ -100,7 +94,7 @@ public static class SQLHandler {
             receipt += ExecuteNonQuery (String.Format (
                 "INSERT INTO {0} VALUES {1}", /* SQL Query to be executed */
                 table,
-                String.Join (DELIMITER, values.Skip (batch_index).Take (SQL.INSERT_BATCH_SIZE).ToArray ())
+                String.Join (SQL.Format.DELIMITER, values.Skip (batch_index).Take (SQL.INSERT_BATCH_SIZE).ToArray ())
             ));
 
             /* Keeping track of how many values have been added */
@@ -138,7 +132,7 @@ public static class SQLHandler {
                             /* Adds row result as delimiter-seperated values */
                             results.Add (
                                 String.Join (
-                                    DELIMITER,
+                                    SQL.Format.DELIMITER,
                                     fields.Where (x => x != null)
                                     .Select (x => x.ToString ())
                                     .ToArray ()
@@ -152,7 +146,7 @@ public static class SQLHandler {
 
                         /* Returns formatted results from query */
                         return String.Join (
-                            NEW_LINE,
+                            SQL.Format.NEW_LINE,
                             results.ToArray ()
                         );
                     }
@@ -161,7 +155,7 @@ public static class SQLHandler {
         } catch (Exception ex) {
             return String.Format (
                 "Error({0}): {1}\n",
-                query.Length > 50 ? query.Substring (0, 50) + "..." : query,
+                Receiptize(query),
                 ex.ToString ()
             );
         }
@@ -188,7 +182,7 @@ public static class SQLHandler {
                     /* Returns number of rows modified */
                     return String.Format (
                         "Query({0}): {1} Row(s) Modified\n",
-                        query.Length > 50 ? query.Substring (0, 50) + "..." : query,
+                        Receiptize(query),
                         rows_modified
                     );
                 }
@@ -196,13 +190,17 @@ public static class SQLHandler {
         } catch (Exception ex) {
             return String.Format (
                 "Error({0}): {1}\n",
-                query.Length > 50 ? query.Substring (0, 50) + "..." : query,
+                Receiptize(query),
                 ex.ToString ()
             );
         }
     }
 
-    public static IEnumerable<string> GetSQLTableDefinitions(string folder_path) {
-        return Directory.EnumerateFiles (folder_path, FileFormat.SQL_FILES);
+    public static string Receiptize(string query) {
+        foreach (char void_char in SQL.Format.VOIDED_CHARS) query = query.Replace(void_char, ' ');
+        return query.Length > SQL.Format.MAX_CHARS_RETURED ? query.Substring (0, SQL.Format.MAX_CHARS_RETURED) + "..." : query;
+    }
+    public static string GetRecepitDate() {
+        return "3" + DateTime.Now.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss.fffffffK").Substring(1);
     }
 }
