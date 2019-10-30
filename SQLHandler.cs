@@ -47,7 +47,7 @@ public static class SQLHandler {
         return receipt;
     }
 
-    public static string Drop(List<string> tables) {
+    public static string Drop(string[] tables) {
         string receipt = String.Format ("{0}: Dropping {1} tables\n",
             DateTime.Now.ToShortTimeString (),
             tables.Count
@@ -60,7 +60,7 @@ public static class SQLHandler {
         }
         return receipt;
     }    
-    public static string Create(List<string> tables_data) {
+    public static string Create(string[] tables_data) {
         string receipt = String.Format ("{0}: Creating {1} tables\n",
             DateTime.Now.ToShortTimeString (),
             tables_data.Count
