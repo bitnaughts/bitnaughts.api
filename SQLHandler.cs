@@ -22,7 +22,7 @@ public static class SQLHandler {
 
     public static string Delete (Dictionary<string, string> values) {
         string receipt = String.Format ("{0}: Adding {1} rows into Tables({2})\n",
-            GetRecepitDate(),
+            GetRecepitDate (),
             values.Count,
             String.Join (SQL.Format.DELIMITER, new List<string> (values.Keys).ToArray ())
         );
@@ -41,36 +41,35 @@ public static class SQLHandler {
         return receipt;
     }
 
-    public static string Drop(string[] tables) {
+    public static string Drop (string[] tables) {
         string receipt = String.Format ("{0}: Dropping {1} tables\n",
-            GetRecepitDate(),
+            GetRecepitDate (),
             tables.Length
         );
         foreach (string table in tables) {
-            receipt += ExecuteNonQuery(String.Format(
+            receipt += ExecuteNonQuery (String.Format (
                 "DROP TABLE {0}",
                 table
             ));
         }
         return receipt;
-    }    
-    public static string Create(string[] tables_data) {
+    }
+    public static string Create (string[] tables_data) {
         string receipt = String.Format ("{0}: Creating {1} tables\n",
-            GetRecepitDate(),
+            GetRecepitDate (),
             tables_data.Length
         );
         foreach (string table_data in tables_data) {
-            receipt += ExecuteNonQuery(
+            receipt += ExecuteNonQuery (
                 table_data
             );
         }
         return receipt;
     }
 
-
     public static string Insert (Dictionary<string, List<string>> values) {
         string receipt = String.Format ("{0}: Adding {1} rows into Tables({2})\n",
-            GetRecepitDate(),
+            GetRecepitDate (),
             values.Count,
             String.Join (SQL.Format.DELIMITER, new List<string> (values.Keys).ToArray ())
         );
@@ -82,7 +81,7 @@ public static class SQLHandler {
 
     public static string Insert (string table, List<string> values) {
         string receipt = String.Format ("{0}: Adding {1} rows into {2}\n",
-            GetRecepitDate(),
+            GetRecepitDate (),
             values.Count,
             table
         );
@@ -155,8 +154,8 @@ public static class SQLHandler {
         } catch (Exception ex) {
             return String.Format (
                 "Error({0}): {1}\n",
-                Receiptize(query),
-                ex.ToString ()
+                Receiptize (query),
+                Receiptize (ex.ToString ())
             );
         }
     }
@@ -182,7 +181,7 @@ public static class SQLHandler {
                     /* Returns number of rows modified */
                     return String.Format (
                         "Query({0}): {1} Row(s) Modified\n",
-                        Receiptize(query),
+                        Receiptize (query),
                         rows_modified
                     );
                 }
@@ -190,17 +189,31 @@ public static class SQLHandler {
         } catch (Exception ex) {
             return String.Format (
                 "Error({0}): {1}\n",
-                Receiptize(query),
-                ex.ToString ()
+                Receiptize (query),
+                Receiptize (ex.ToString ())
             );
         }
     }
+    /* Scrubs and truncates large texts */
+    public static string Receiptize (string text) {
+        string output = "";
+        foreach (char curr_char in text) {
+            if (output.Length == SQL.Format.MAX_CHARS_RETURED) return output + " ..."; /* Immediately returns when output is too long */
+            else if (SQL.Format.VOIDED_CHARS.Contains (curr_char)) continue; /* Skips character if in illegal set */
+            else if (curr_char == ' ' && output.Last() == ' ') continue; /* Skips whitespace longer than length one */
+            else output += curr_char; /* Appends valid character from original string */
+        }
+        return output;
 
-    public static string Receiptize(string query) {
-        foreach (char void_char in SQL.Format.VOIDED_CHARS) query = query.Replace(void_char, ' ');
-        return query.Length > SQL.Format.MAX_CHARS_RETURED ? query.Substring (0, SQL.Format.MAX_CHARS_RETURED) + "..." : query;
+        // ~~~ First Iteration of Logic for Receiptize ~~~  
+        // /* Scrub for unwanted characters */
+        // foreach (char void_char in ) query = query.Replace(void_char, ' ');
+        // /* Scrub excessive whitespacing */
+        // query = String.Join(" ", query.Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries));
+        // /* Truncate after set max number of characters */
+        // return query.Length > SQL.Format.MAX_CHARS_RETURED ? query.Substring (0, SQL.Format.MAX_CHARS_RETURED) + "..." : query;
     }
-    public static string GetRecepitDate() {
-        return "3" + DateTime.Now.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss.fffffffK").Substring(1);
+    public static string GetRecepitDate () {
+        return "3" + DateTime.Now.ToString ("yyyy'-'MM'-'dd'T'HH':'mm':'ss.fffffffK").Substring (1);
     }
 }
