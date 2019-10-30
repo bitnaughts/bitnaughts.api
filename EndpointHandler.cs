@@ -40,7 +40,7 @@ namespace BitNaughts {
                             values[Database.Tables.Systems.TABLE_NAME].Add (WrapValues (new string[] {
                                 system.id, galaxy.id, system.seed, system.position_x, system.position_y
                             }));
-                            values[Database.Tables.SystemsConnection.TABLE_NAME].AddRange (((IEnumerable<dynamic>) system.connected_systems).Select (
+                            values[Database.Tables.SystemConnections.TABLE_NAME].AddRange (((IEnumerable<dynamic>) system.connected_systems).Select (
                                 connected_system => WrapValues (new string[] {
                                     system.id, connected_system
                                 })

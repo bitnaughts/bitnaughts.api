@@ -50,7 +50,7 @@ public static class SQLHandler {
     public static string Drop(string[] tables) {
         string receipt = String.Format ("{0}: Dropping {1} tables\n",
             DateTime.Now.ToShortTimeString (),
-            tables.Count
+            tables.Length
         );
         foreach (string table in tables) {
             receipt += ExecuteNonQuery(String.Format(
@@ -63,7 +63,7 @@ public static class SQLHandler {
     public static string Create(string[] tables_data) {
         string receipt = String.Format ("{0}: Creating {1} tables\n",
             DateTime.Now.ToShortTimeString (),
-            tables_data.Count
+            tables_data.Length
         );
         foreach (string table_data in tables_data) {
             receipt += ExecuteNonQuery(
