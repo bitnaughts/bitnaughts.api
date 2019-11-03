@@ -5,7 +5,7 @@ public static class Database {
             public const string SQL_DEFINITION =
                 @"CREATE TABLE [dbo].[Galaxies] (
                     [g_galaxy_id] INT PRIMARY KEY,
-                    [g_seed] INT NULL,
+                    [g_seed] INT NULL
                 )",
                 TABLE_NAME = "dbo.Galaxies",
                 ID = "g_galaxy_id",
