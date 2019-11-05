@@ -145,7 +145,7 @@ namespace BitNaughts {
             try {
                 string supp_old = (string) req.Query[supp_old];
                 string supp_new = (string) req.Query[supp_new];
-                return supp_old + " replaced by " supp_new + ": " + SQLHandler.ExecuteSQLiteNonQuery(@" 
+                return supp_old + " replaced by " + supp_new + ": " + SQLHandler.ExecuteSQLiteNonQuery(@" 
                    
                 ");
             } catch (Exception ex) {
