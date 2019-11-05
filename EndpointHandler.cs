@@ -28,12 +28,12 @@ namespace BitNaughts {
             try {
                 dynamic warehouse = await GetBody (req.Body);
 
-                int supp_key = SQLHandler.ExecuteSQLiteQuery(@"
+                string supp_key = SQLHandler.ExecuteSQLiteQuery(@"
                     SELECT s_suppkey
                     FROM supplier
                     WHERE s_name = " + (string)warehouse.supplier
                 );
-                int nat_key = SQLHandler.ExecuteSQLiteQuery(@"
+                string nat_key = SQLHandler.ExecuteSQLiteQuery(@"
                     SELECT n_nationkey
                     FROM supplier
                     WHERE n_name = " + (string)warehouse.nation
@@ -42,10 +42,10 @@ namespace BitNaughts {
                     String.Format(
                         "INSERT INTO warehouse VALUES ({0}, {1}, {2}, {3}, {4})",
                         (string)warehouse.name,
-                        (string)supp_key,
+                        supp_key,
                         (string)warehouse.capacity,
                         (string)warehouse.address,
-                        (string)nat_key
+                        nat_key
                     )
                 );
             } catch (Exception ex) {
@@ -88,7 +88,7 @@ namespace BitNaughts {
         [FunctionName ("Lab7EuropeanWarehousesSmallerThanX")] /* API Endpoints: /api/Lab7EuropeanWarehousesSmallerThanX */
         public static async Task<string> Lab7EuropeanWarehousesSmallerThanX ([HttpTrigger (AuthorizationLevel.Anonymous, HTTP.GET, Route = "Lab7EuropeanWarehousesSmallerThanX")] HttpRequest req) {
             try {
-                double x = (double) req.Query[x];
+                string x = (string) req.Query["x"];
                 return "Warehouses in Europe with capacity smaller than " + x + " include " + SQLHandler.ExecuteSQLiteQuery (@"
                     SELECT w_name
                     FROM warehouse
@@ -110,7 +110,7 @@ namespace BitNaughts {
         [FunctionName ("Lab7WarehouseLargeEnoughForSupplier")] /* API Endpoints: /api/Lab7WarehouseLargeEnoughForSupplier */
         public static async Task<string> Lab7WarehouseLargeEnoughForSupplier ([HttpTrigger (AuthorizationLevel.Anonymous, HTTP.GET, Route = "Lab7WarehouseLargeEnoughForSupplier")] HttpRequest req) {
             try {
-                string name = (string) req.Query[name];
+                string name = (string) req.Query["name"];
                 return name + " has enough warehouse space: " + SQLHandler.ExecuteSQLiteQuery (@"
                     
                 ");
@@ -123,7 +123,7 @@ namespace BitNaughts {
         [FunctionName ("Lab7WarehousesInNation")] /* API Endpoints: /api/Lab7WarehousesInNation */
         public static async Task<string> Lab7WarehousesInNation ([HttpTrigger (AuthorizationLevel.Anonymous, HTTP.GET, Route = "Lab7WarehousesInNation")] HttpRequest req) {
             try {
-                string name = (string) req.Query[name];
+                string name = (string) req.Query["name"];
                 return name + " has warehouses: " + SQLHandler.ExecuteSQLiteQuery(@" 
                     SELECT w_name
                     FROM warehouse
@@ -143,8 +143,8 @@ namespace BitNaughts {
         [FunctionName ("Lab7WarehouseChange")] /* API Endpoints: /api/Lab7WarehouseChange */
         public static async Task<string> Lab7WarehouseChange ([HttpTrigger (AuthorizationLevel.Anonymous, HTTP.GET, Route = "Lab7WarehouseChange")] HttpRequest req) {
             try {
-                string supp_old = (string) req.Query[supp_old];
-                string supp_new = (string) req.Query[supp_new];
+                string supp_old = (string) req.Query["supp_old"];
+                string supp_new = (string) req.Query["supp_new"];
                 return supp_old + " replaced by " + supp_new + ": " + SQLHandler.ExecuteSQLiteNonQuery(@" 
                    
                 ");
