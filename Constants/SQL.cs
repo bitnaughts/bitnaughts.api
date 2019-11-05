@@ -4,8 +4,8 @@ public static class SQL {
         public const string DELIMITER = ",",
             NEW_LINE = "\n";
 
-        /* How explicit/verbose telemetry receipts are */
-        public const int MAX_CHARS_RETURED = 150;
+        /* How explicit/verbose telemetry receipts are (-1 == no restriction) */
+        public const int MAX_CHARS_RETURED = -1;
         public const string VOIDED_CHARS = "\n\r\t";
 
         public const string SQL_FILES = "*.sql", SQL_FILE_TYPE = ".sql";
