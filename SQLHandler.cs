@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Data.SQLite;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -184,6 +185,96 @@ public static class SQLHandler {
                         Receiptize (query),
                         rows_modified
                     );
+                }
+            }
+        } catch (Exception ex) {
+            return String.Format (
+                "Error({0}): {1}\n",
+                Receiptize (query),
+                Receiptize (ex.ToString ())
+            );
+        }
+    }
+    public static string ExecuteSQLiteQuery (string query) {
+        try {
+            /* Defines connection parameters and query logic */
+            using (SQLiteConnection conn = new SQLiteConnection (@"Data Source=C:\TPCH.db;Version=3; FailIfMissing=True; Foreign Keys=True;")) {
+                using (SQLiteCommand cmd = new SQLiteCommand (query, conn)) {
+
+                    /* Connects to database and executes query */
+                    conn.Open ();
+                    using (SQLiteDataReader reader = cmd.ExecuteReader ()) {
+
+                        /* Holds row results as they are read */
+                        List<string> results = new List<string> ();
+                        while (reader.Read ()) {
+                            
+                            /* Dumps values into Object array */
+                            Object[] fields = new Object[reader.FieldCount];
+                            reader.GetValues (fields);
+
+                            /* Adds row result as delimiter-seperated values */
+                            results.Add (
+                                String.Join (
+                                    SQL.Format.DELIMITER,
+                                    fields.Where (x => x != null)
+                                    .Select (x => x.ToString ())
+                                    .ToArray ()
+                                ) + "\n"
+                            );
+                            Console.WriteLine (String.Join (
+                                SQL.Format.DELIMITER,
+                                fields.Where (x => x != null)
+                                .Select (x => x.ToString ())
+                                .ToArray ()
+                            ));
+                        }
+                        /* Closes the database connection */
+                        conn.Close ();
+
+                        /* Returns formatted results from query */
+                        return String.Join (
+                            SQL.Format.NEW_LINE,
+                            results.ToArray ()
+                        );
+                    }
+                }
+            }
+        } catch (Exception ex) {
+            return String.Format (
+                "Error({0}): {1}\n",
+                Receiptize (query),
+                Receiptize (ex.ToString ())
+            );
+        }
+    }
+
+    /* Manages database connection, runs commands, and returns receipts */
+    public static string ExecuteSQLiteNonQuery (string[] queries) {
+        string result = "";
+        foreach (string query in queries) {
+            result += ExecuteSQLiteNonQuery (query);
+        }
+        return result;
+    }
+    public static string ExecuteSQLiteNonQuery (string query) {
+        try {
+            /* Defines connection parameters and query logic */
+            using (SQLiteConnection conn = new SQLiteConnection (@"Data Source=C:\TPCH.db;Version=3; FailIfMissing=True; Foreign Keys=True;")) {
+                using (SQLiteCommand cmd = new SQLiteCommand (query, conn)) {
+                    
+                    /* Connects to database and executes query */
+                    conn.Open ();
+                    using (SQLiteDataReader reader = cmd.ExecuteReader ()) {
+                        int rows_modified = cmd.ExecuteNonQuery ();
+
+                        /* Returns number of rows modified */
+                        return String.Format (
+                            "Query({0}): {1} Row(s) Modified\n",
+                            Receiptize (query),
+                            rows_modified
+                        );
+                    }
                 }
             }
         } catch (Exception ex) {

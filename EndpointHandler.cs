@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Data.SQLite;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,6 +12,93 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 
 namespace BitNaughts {
     public static class EndpointHandler {
+
+        [FunctionName ("Lab7CreatewarehouseTable")] /* API Endpoints: /api/Lab7CreatewarehouseTable */
+        public static async Task<string> Lab7CreatewarehouseTable ([HttpTrigger (AuthorizationLevel.Anonymous, HTTP.POST, Route = "Lab7CreatewarehouseTable")] HttpRequest req) {
+            try {
+                SQLHandler.ExecuteSQLiteNonQuery (Warehouse.SQL_DEFINITION);
+            } catch (Exception ex) {
+                return ex.ToString ();
+            }
+            return new InvalidOperationException ().ToString ();
+        }
+        [FunctionName ("Lab7Createwarehouse")] /* API Endpoints: /api/Lab7Createwarehouse */
+        public static async Task<string> Lab7Createwarehouse ([HttpTrigger (AuthorizationLevel.Anonymous, HTTP.POST, Route = "Lab7Createwarehouse")] HttpRequest req) {
+            try {
+                dynamic warehouse = await GetBody (req.Body);
+
+                //SQLHandler.ExecuteSQLNonQuery(Warehouse.SQL_DEFINITION);
+            } catch (Exception ex) {
+                return ex.ToString ();
+            }
+            return new InvalidOperationException ().ToString ();
+        }
+        [FunctionName ("Lab7MinWarehouseSupplier")] /* API Endpoints: /api/Lab7MinWarehouseSupplier */
+        public static async Task<string> Lab7MinWarehouseSupplier ([HttpTrigger (AuthorizationLevel.Anonymous, HTTP.POST, Route = "Lab7MinWarehouseSupplier")] HttpRequest req) {
+            try {
+                dynamic warehouse = await GetBody (req.Body);
+
+                //SQLHandler.ExecuteSQLNonQuery(Warehouse.SQL_DEFINITION);
+            } catch (Exception ex) {
+                return ex.ToString ();
+            }
+            return new InvalidOperationException ().ToString ();
+        }
+        [FunctionName ("Lab7MaxWarehouseCapacity")] /* API Endpoints: /api/Lab7MaxWarehouseCapacity */
+        public static async Task<string> Lab7MaxWarehouseCapacity ([HttpTrigger (AuthorizationLevel.Anonymous, HTTP.POST, Route = "Lab7MaxWarehouseCapacity")] HttpRequest req) {
+            try {
+                dynamic warehouse = await GetBody (req.Body);
+
+                //SQLHandler.ExecuteSQLNonQuery(Warehouse.SQL_DEFINITION);
+            } catch (Exception ex) {
+                return ex.ToString ();
+            }
+            return new InvalidOperationException ().ToString ();
+        }
+        [FunctionName ("Lab7EuropeanWarehousesSmallerThanX")] /* API Endpoints: /api/Lab7EuropeanWarehousesSmallerThanX */
+        public static async Task<string> Lab7EuropeanWarehousesSmallerThanX ([HttpTrigger (AuthorizationLevel.Anonymous, HTTP.POST, Route = "Lab7EuropeanWarehousesSmallerThanX")] HttpRequest req) {
+            try {
+                dynamic warehouse = await GetBody (req.Body);
+
+                //SQLHandler.ExecuteSQLNonQuery(Warehouse.SQL_DEFINITION);
+            } catch (Exception ex) {
+                return ex.ToString ();
+            }
+            return new InvalidOperationException ().ToString ();
+        }
+        [FunctionName ("Lab7WarehouseLargeEnoughForSupplier")] /* API Endpoints: /api/Lab7WarehouseLargeEnoughForSupplier */
+        public static async Task<string> Lab7WarehouseLargeEnoughForSupplier ([HttpTrigger (AuthorizationLevel.Anonymous, HTTP.POST, Route = "Lab7WarehouseLargeEnoughForSupplier")] HttpRequest req) {
+            try {
+                dynamic warehouse = await GetBody (req.Body);
+
+                //SQLHandler.ExecuteSQLNonQuery(Warehouse.SQL_DEFINITION);
+            } catch (Exception ex) {
+                return ex.ToString ();
+            }
+            return new InvalidOperationException ().ToString ();
+        }
+        [FunctionName ("Lab7WarehousesInNation")] /* API Endpoints: /api/Lab7WarehousesInNation */
+        public static async Task<string> Lab7WarehousesInNation ([HttpTrigger (AuthorizationLevel.Anonymous, HTTP.POST, Route = "Lab7WarehousesInNation")] HttpRequest req) {
+            try {
+                dynamic warehouse = await GetBody (req.Body);
+
+                //SQLHandler.ExecuteSQLNonQuery(Warehouse.SQL_DEFINITION);
+            } catch (Exception ex) {
+                return ex.ToString ();
+            }
+            return new InvalidOperationException ().ToString ();
+        }
+        [FunctionName ("Lab7WarehouseChange")] /* API Endpoints: /api/Lab7WarehouseChange */
+        public static async Task<string> Lab7WarehouseChange ([HttpTrigger (AuthorizationLevel.Anonymous, HTTP.POST, Route = "Lab7WarehouseChange")] HttpRequest req) {
+            try {
+                dynamic warehouse = await GetBody (req.Body);
+
+                //SQLHandler.ExecuteSQLNonQuery(Warehouse.SQL_DEFINITION);
+            } catch (Exception ex) {
+                return ex.ToString ();
+            }
+            return new InvalidOperationException ().ToString ();
+        }
 
         /* Endpoint Functions */
         /* * * * * * * * * * */

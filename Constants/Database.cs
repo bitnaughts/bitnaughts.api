@@ -141,7 +141,7 @@ public static class Database {
                 LOG_OUT_DATE = "sh_logout";
         }
         public static class CombatHistory {
-            public const string SQL_DEFINITION = 
+            public const string SQL_DEFINITION =
                 @"CREATE TABLE [dbo].[CombatHistory] (
                     [ch_combat_id] INT PRIMARY KEY,
                     [ch_ship_1_id] INT NULL,
@@ -183,4 +183,16 @@ public static class Database {
                 DATE = "v_date";
         }
     }
+}
+
+public static class Warehouse {
+    public const string SQL_DEFINITION =
+        @"CREATE TABLE warehouse {
+            w_warehousekey decimal(3,0) not null,
+            w_name char(25) not null,
+            w_supplierkey decimal(2,0) not null,
+            w_capacity decimal(6,2) not null,
+            w_address varchar(40) not null,
+            w_nationkey decimal(2,0) not null
+        }";
 }
