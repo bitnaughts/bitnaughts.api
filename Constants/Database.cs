@@ -187,12 +187,12 @@ public static class Database {
 
 public static class Warehouse {
     public const string SQL_DEFINITION =
-        @"CREATE TABLE warehouse {
+        @"CREATE TABLE warehouse (
             w_warehousekey decimal(3,0) not null,
             w_name char(25) not null,
             w_supplierkey decimal(2,0) not null,
             w_capacity decimal(6,2) not null,
             w_address varchar(40) not null,
             w_nationkey decimal(2,0) not null
-        }";
+        )";
 }

@@ -16,7 +16,8 @@ namespace BitNaughts {
         [FunctionName ("Lab7CreateWarehouseTable")] /* API Endpoints: /api/Lab7CreateWarehouseTable */
         public static async Task<string> Lab7CreateWarehouseTable ([HttpTrigger (AuthorizationLevel.Anonymous, HTTP.POST, Route = "Lab7CreateWarehouseTable")] HttpRequest req) {
             try {
-                SQLHandler.ExecuteSQLiteNonQuery (Warehouse.SQL_DEFINITION);
+                return SQLHandler.ExecuteSQLiteNonQuery ("DROP TABLE warehouse") +
+                    SQLHandler.ExecuteSQLiteNonQuery (Warehouse.SQL_DEFINITION);
             } catch (Exception ex) {
                 return ex.ToString ();
             }
@@ -28,23 +29,25 @@ namespace BitNaughts {
             try {
                 dynamic warehouse = await GetBody (req.Body);
 
-                string supp_key = SQLHandler.ExecuteSQLiteQuery(@"
+                string supp_key = SQLHandler.ExecuteSQLiteQuery (@"
                     SELECT s_suppkey
                     FROM supplier
-                    WHERE s_name = " + (string)warehouse.supplier
-                );
-                string nat_key = SQLHandler.ExecuteSQLiteQuery(@"
+                    WHERE s_name = '" + (string) warehouse.supplier + "'");
+                string nat_key = SQLHandler.ExecuteSQLiteQuery (@"
                     SELECT n_nationkey
-                    FROM supplier
-                    WHERE n_name = " + (string)warehouse.nation
-                );
-                return "Added warehouse: " + SQLHandler.ExecuteSQLiteNonQuery(
-                    String.Format(
-                        "INSERT INTO warehouse VALUES ({0}, {1}, {2}, {3}, {4})",
-                        (string)warehouse.name,
+                    FROM nation
+                    WHERE n_name = '" + (string) warehouse.nation + "'");
+                string warehouse_index = SQLHandler.ExecuteSQLiteQuery (@"
+                    SELECT COUNT(*)
+                    FROM warehouse");
+                return "Added warehouse: " + SQLHandler.ExecuteSQLiteNonQuery (
+                    String.Format (
+                        "INSERT INTO warehouse VALUES ({0}, '{1}', {2}, {3}, '{4}', {5})",
+                        warehouse_index,
+                        (string) warehouse.name,
                         supp_key,
-                        (string)warehouse.capacity,
-                        (string)warehouse.address,
+                        (string) warehouse.capacity,
+                        (string) warehouse.address,
                         nat_key
                     )
                 );
@@ -57,12 +60,45 @@ namespace BitNaughts {
         [FunctionName ("Lab7MinWarehouseSupplier")] /* API Endpoints: /api/Lab7MinWarehouseSupplier */
         public static async Task<string> Lab7MinWarehouseSupplier ([HttpTrigger (AuthorizationLevel.Anonymous, HTTP.GET, Route = "Lab7MinWarehouseSupplier")] HttpRequest req) {
             try {
-                return "The supplier with the smallest number of warehouses is " + SQLHandler.ExecuteSQLiteQuery (@"
+                if (int.Parse(SQLHandler.ExecuteSQLiteQuery(@"
+                    SELECT COUNT(*)
+                    FROM supplier
+                    LEFT JOIN (
+                        SELECT w_supplierkey, COUNT(*) sum_warehouses
+                        FROM warehouse
+                        GROUP BY w_supplierkey
+                    ) w ON w_supplierkey = s_suppkey
+                    WHERE sum_warehouses IS NULL
+                ")) > 0)
+                {
+                    return "The supplier with the smallest number of warehouses is " + SQLHandler.ExecuteSQLiteQuery(@"
+                        SELECT s_name
+                        FROM supplier
+                        LEFT JOIN (
+                            SELECT w_supplierkey, COUNT(*) sum_warehouses
+                            FROM warehouse
+                            GROUP BY w_supplierkey
+                        ) w ON w_supplierkey = s_suppkey
+                        WHERE sum_warehouses IS NULL
+                    ");
+                }
+                return "The supplier with the smallest number of warehouses is " + SQLHandler.ExecuteSQLiteQuery(@"
                     SELECT s_name
                     FROM supplier
-                    INNER JOIN (
-                        
-                    )");
+                    LEFT JOIN (
+                        SELECT w_supplierkey, COUNT(*) sum_warehouses
+                        FROM warehouse
+                        GROUP BY w_supplierkey
+                    ) w ON w_supplierkey = s_suppkey
+                    WHERE sum_warehouses = (
+                        SELECT MIN(sum_warehouses_tot)
+                        FROM (
+                            SELECT COUNT(*) sum_warehouses_tot
+                            FROM warehouse
+                            GROUP BY w_supplierkey
+                        )
+                    )
+                ");
             } catch (Exception ex) {
                 return ex.ToString ();
             }
@@ -111,9 +147,28 @@ namespace BitNaughts {
         public static async Task<string> Lab7WarehouseLargeEnoughForSupplier ([HttpTrigger (AuthorizationLevel.Anonymous, HTTP.GET, Route = "Lab7WarehouseLargeEnoughForSupplier")] HttpRequest req) {
             try {
                 string name = (string) req.Query["name"];
-                return name + " has enough warehouse space: " + SQLHandler.ExecuteSQLiteQuery (@"
-                    
-                ");
+                int parts_num = int.Parse (SQLHandler.ExecuteSQLiteQuery (@"
+                        SELECT COUNT(*)
+                        FROM partsupp
+                        WHERE ps_suppkey = (
+                            SELECT s_suppkey
+                            FROM supplier
+                            WHERE s_name = '" + name + @"'
+                        )
+                    "));
+                int cap_num = int.Parse (SQLHandler.ExecuteSQLiteQuery (@"
+                        SELECT COUNT(*)
+                        FROM partsupp
+                        WHERE ps_suppkey = (
+                            SELECT s_suppkey
+                            FROM supplier
+                            WHERE s_name = '" + name + @"'
+                        )
+                    "));
+                if (parts_num < cap_num) {
+                    return name + " has enough warehouse space";
+                }
+                return name + " doesn't have enough warehouse space";
             } catch (Exception ex) {
                 return ex.ToString ();
             }
@@ -124,7 +179,7 @@ namespace BitNaughts {
         public static async Task<string> Lab7WarehousesInNation ([HttpTrigger (AuthorizationLevel.Anonymous, HTTP.GET, Route = "Lab7WarehousesInNation")] HttpRequest req) {
             try {
                 string name = (string) req.Query["name"];
-                return name + " has warehouses: " + SQLHandler.ExecuteSQLiteQuery(@" 
+                return name + " has warehouses: " + SQLHandler.ExecuteSQLiteQuery (@" 
                     SELECT w_name
                     FROM warehouse
                     WHERE w_nationkey = (
@@ -144,10 +199,19 @@ namespace BitNaughts {
         public static async Task<string> Lab7WarehouseChange ([HttpTrigger (AuthorizationLevel.Anonymous, HTTP.GET, Route = "Lab7WarehouseChange")] HttpRequest req) {
             try {
                 string supp_old = (string) req.Query["supp_old"];
+                string supp_old_key = SQLHandler.ExecuteSQLiteQuery (@"
+                    SELECT s_suppkey
+                    FROM supplier
+                    WHERE s_name = '" + supp_old + "'");
                 string supp_new = (string) req.Query["supp_new"];
-                return supp_old + " replaced by " + supp_new + ": " + SQLHandler.ExecuteSQLiteNonQuery(@" 
-                   
-                ");
+                string supp_new_key = SQLHandler.ExecuteSQLiteQuery (@"
+                    SELECT s_suppkey
+                    FROM supplier
+                    WHERE s_name = '" + supp_new + "'");
+                return supp_old + " replaced by " + supp_new + ": " + SQLHandler.ExecuteSQLiteNonQuery (@"
+                    UPDATE warehouse
+                    SET w_supplierkey = " + supp_new_key + @"
+                    WHERE w_supplierkey = " + supp_old_key);
             } catch (Exception ex) {
                 return ex.ToString ();
             }

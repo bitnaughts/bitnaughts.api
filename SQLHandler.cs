@@ -198,7 +198,7 @@ public static class SQLHandler {
     public static string ExecuteSQLiteQuery (string query) {
         try {
             /* Defines connection parameters and query logic */
-            using (SQLiteConnection conn = new SQLiteConnection (@"Data Source=C:\TPCH.db;Version=3; FailIfMissing=True; Foreign Keys=True;")) {
+            using (SQLiteConnection conn = new SQLiteConnection (@"Data Source=C:\Users\Mutilar\Desktop\TPCH.db;Version=3; FailIfMissing=True; Foreign Keys=True;")) {
                 using (SQLiteCommand cmd = new SQLiteCommand (query, conn)) {
 
                     /* Connects to database and executes query */
@@ -220,7 +220,7 @@ public static class SQLHandler {
                                     fields.Where (x => x != null)
                                     .Select (x => x.ToString ())
                                     .ToArray ()
-                                ) + "\n"
+                                )
                             );
                             Console.WriteLine (String.Join (
                                 SQL.Format.DELIMITER,
@@ -260,21 +260,19 @@ public static class SQLHandler {
     public static string ExecuteSQLiteNonQuery (string query) {
         try {
             /* Defines connection parameters and query logic */
-            using (SQLiteConnection conn = new SQLiteConnection (@"Data Source=C:\TPCH.db;Version=3; FailIfMissing=True; Foreign Keys=True;")) {
+            using (SQLiteConnection conn = new SQLiteConnection (@"Data Source=C:\Users\Mutilar\Desktop\TPCH.db;Version=3; FailIfMissing=True; Foreign Keys=True;")) {
                 using (SQLiteCommand cmd = new SQLiteCommand (query, conn)) {
                     
                     /* Connects to database and executes query */
                     conn.Open ();
-                    using (SQLiteDataReader reader = cmd.ExecuteReader ()) {
-                        int rows_modified = cmd.ExecuteNonQuery ();
+                    int rows_modified = cmd.ExecuteNonQuery ();
 
-                        /* Returns number of rows modified */
-                        return String.Format (
-                            "Query({0}): {1} Row(s) Modified\n",
-                            Receiptize (query),
-                            rows_modified
-                        );
-                    }
+                    /* Returns number of rows modified */
+                    return String.Format (
+                        "Query({0}): {1} Row(s) Modified\n",
+                        Receiptize (query),
+                        rows_modified
+                    );
                 }
             }
         } catch (Exception ex) {
@@ -291,7 +289,7 @@ public static class SQLHandler {
         foreach (char curr_char in text) {
             if (SQL.Format.MAX_CHARS_RETURED > 0 && output.Length == SQL.Format.MAX_CHARS_RETURED) return output + " ..."; /* Immediately returns when output is too long */
             else if (SQL.Format.VOIDED_CHARS.Contains (curr_char)) continue; /* Skips character if in illegal set */
-            else if (curr_char == ' ' && output.Last () == ' ') continue; /* Skips whitespace longer than length one */
+            else if (output != "" && curr_char == ' ' && output.Last () == ' ') continue; /* Skips whitespace longer than length one */
             else output += curr_char; /* Appends valid character from original string */
         }
         return output;
