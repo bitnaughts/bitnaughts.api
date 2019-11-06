@@ -220,13 +220,13 @@ namespace BitNaughts {
 
         /* Endpoint Functions */
         /* * * * * * * * * * */
-        [FunctionName (Endpoints.SET)] /* API Endpoints: /api/set?flag=reset, /api/set?flag=add&table=players */
-        public static async Task<string> Set ([HttpTrigger (AuthorizationLevel.Anonymous, HTTP.POST, Route = Endpoints.SET)] HttpRequest req) {
+        [FunctionName (HTTP.Endpoints.SET)] /* API Endpoints: /api/set?flag=reset, /api/set?flag=add&table=players */
+        public static async Task<string> Set ([HttpTrigger (AuthorizationLevel.Anonymous, HTTP.POST, Route = HTTP.Endpoints.SET)] HttpRequest req) {
             try {
                 /* Reads data into table and returns transaction receipt */
-                switch (req.Query[Endpoints.Parameters.FLAG]) {
-                    case Endpoints.Parameters.Values.RESET:
-
+                switch (req.Query[HTTP.Endpoints.Parameters.FLAG]) {
+                    case HTTP.Endpoints.Parameters.Values.RESET:
+                        
                         /* Pulls galaxy JSON from HTTP Body */
                         dynamic galaxy = await GetBody (req.Body);
 
@@ -271,13 +271,13 @@ namespace BitNaughts {
             return new InvalidOperationException ().ToString ();
         }
 
-        [FunctionName (Endpoints.GET)] /* API Endpoint: /api/get?table=players&fields=* */
-        public static async Task<string> Get ([HttpTrigger (AuthorizationLevel.Anonymous, HTTP.GET, Route = Endpoints.GET)] HttpRequest req) {
+        [FunctionName (HTTP.Endpoints.GET)] /* API Endpoint: /api/get?table=players&fields=* */
+        public static async Task<string> Get ([HttpTrigger (AuthorizationLevel.Anonymous, HTTP.GET, Route = HTTP.Endpoints.GET)] HttpRequest req) {
             try {
                 /* Returns formatted result of selection query */
 
-                string type = req.Query[Endpoints.Parameters.TYPE];
-                string id = req.Query[Endpoints.Parameters.ID];
+                string type = req.Query[HTTP.Endpoints.Parameters.TYPE];
+                string id = req.Query[HTTP.Endpoints.Parameters.ID];
 
                 switch (type) {
                     case Database.Tables.Galaxies.TABLE_NAME:
@@ -306,8 +306,8 @@ namespace BitNaughts {
             return new InvalidOperationException ().ToString ();
         }
 
-        [FunctionName (Endpoints.UPDATE)] /* API Endpoint: /api/update?table=players */
-        public static async Task<string> Update ([HttpTrigger (AuthorizationLevel.Anonymous, HTTP.PUT, Route = Endpoints.UPDATE)] HttpRequest req) {
+        [FunctionName (HTTP.Endpoints.UPDATE)] /* API Endpoint: /api/update?table=players */
+        public static async Task<string> Update ([HttpTrigger (AuthorizationLevel.Anonymous, HTTP.PUT, Route = HTTP.Endpoints.UPDATE)] HttpRequest req) {
 
             // /* Overrides data in table and returns transaction receipt */
             // dynamic req_body = await GetBody (req.Body);
@@ -340,8 +340,8 @@ namespace BitNaughts {
             return new InvalidOperationException ().ToString ();
         }
 
-        [FunctionName (Endpoints.RESET)] /* API Endpoint: /api/reset */
-        public static async Task<string> Reset ([HttpTrigger (AuthorizationLevel.Anonymous, HTTP.GET, Route = Endpoints.RESET)] HttpRequest req) {
+        [FunctionName (HTTP.Endpoints.RESET)] /* API Endpoint: /api/reset */
+        public static async Task<string> Reset ([HttpTrigger (AuthorizationLevel.Anonymous, HTTP.GET, Route = HTTP.Endpoints.RESET)] HttpRequest req) {
             try {
                 /* Drops old tables and creates new ones with updated fields */
                 return SQLHandler.Drop (
