@@ -49,7 +49,7 @@ public static class SQLHandler {
         );
         foreach (string table in tables) {
             receipt += ExecuteNonQuery (String.Format (
-                "DROP TABLE {0}",
+                "DROP TABLE {0}", /* SQL Query to be executed when a condition is specified */
                 table
             ));
         }
@@ -136,7 +136,7 @@ public static class SQLHandler {
                                     fields.Where (x => x != null)
                                     .Select (x => x.ToString ())
                                     .ToArray ()
-                                ) + "\n"
+                                )
                             );
                         }
 
@@ -222,12 +222,6 @@ public static class SQLHandler {
                                     .ToArray ()
                                 )
                             );
-                            Console.WriteLine (String.Join (
-                                SQL.Format.DELIMITER,
-                                fields.Where (x => x != null)
-                                .Select (x => x.ToString ())
-                                .ToArray ()
-                            ));
                         }
                         /* Closes the database connection */
                         conn.Close ();
@@ -293,14 +287,6 @@ public static class SQLHandler {
             else output += curr_char; /* Appends valid character from original string */
         }
         return output;
-
-        // ~~~ First Iteration of Logic for Receiptize ~~~  
-        // /* Scrub for unwanted characters */
-        // foreach (char void_char in ) query = query.Replace(void_char, ' ');
-        // /* Scrub excessive whitespacing */
-        // query = String.Join(" ", query.Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries));
-        // /* Truncate after set max number of characters */
-        // return query.Length > SQL.Format.MAX_CHARS_RETURED ? query.Substring (0, SQL.Format.MAX_CHARS_RETURED) + "..." : query;
     }
     public static string GetRecepitDate () {
         return "3" + DateTime.Now.ToString ("yyyy'-'MM'-'dd'T'HH':'mm':'ss.fffffffK").Substring (1);
