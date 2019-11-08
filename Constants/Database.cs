@@ -1,48 +1,75 @@
 public static class Database {
     public const string NAME = "bitnaughtsdb";
+
+    public static readonly string[] ALL_TABLES = {
+        Tables.Galaxies.ALIAS,
+        Tables.Systems.ALIAS,
+        Tables.SystemConnections.ALIAS,
+        Tables.Planets.ALIAS,
+        Tables.Asteroids.ALIAS,
+        Tables.Players.ALIAS,
+        Tables.Ships.ALIAS,
+        Tables.SessionHistory.ALIAS,
+        Tables.CombatHistory.ALIAS,
+        Tables.Mines.ALIAS,
+        Tables.Visits.ALIAS
+    };
+    public static readonly string[] ALL_TABLE_DEFINITIONS = {
+        Tables.Galaxies.SQL_DEFINITION,
+        Tables.Systems.SQL_DEFINITION,
+        Tables.SystemConnections.SQL_DEFINITION,
+        Tables.Planets.SQL_DEFINITION,
+        Tables.Asteroids.SQL_DEFINITION,
+        Tables.Players.SQL_DEFINITION,
+        Tables.Ships.SQL_DEFINITION,
+        Tables.SessionHistory.SQL_DEFINITION,
+        Tables.CombatHistory.SQL_DEFINITION,
+        Tables.Mines.SQL_DEFINITION,
+        Tables.Visits.SQL_DEFINITION
+    };
     public static class Tables {
         public static class Galaxies {
-            public const string SQL_DEFINITION =
-                @"CREATE TABLE [dbo].[Galaxies] (
+            public const string ALIAS = "dbo.Galaxies",
+                SQL_DEFINITION = @"CREATE TABLE [dbo].[Galaxies] (
                     [g_galaxy_id] INT PRIMARY KEY,
                     [g_seed] INT NOT NULL
                 )",
-                TABLE_NAME = "dbo.Galaxies",
                 ID = "g_galaxy_id",
                 SEED = "g_seed";
         }
         public static class Systems {
-            public const string SQL_DEFINITION =
-                @"CREATE TABLE [dbo].[Systems] (
+            public const string ALIAS = "dbo.Systems",
+                SQL_DEFINITION = @"CREATE TABLE [dbo].[Systems] (
                     [s_system_id] INT PRIMARY KEY,
                     [s_galaxy_id] INT NOT NULL,
                     [s_seed] INT NOT NULL,
                     [s_position_x] DECIMAL(4,2) NOT NULL,
                     [s_position_y] DECIMAL(4,2) NOT NULL
                 )",
-                TABLE_NAME = "dbo.Systems",
                 ID = "s_system_id",
                 GALAXY_ID = "s_galaxy_id",
-                SEED = "s_seed";
+                SEED = "s_seed",
+                POSITION_X = "s_position_x",
+                POSITION_Y = "s_position_y";
         }
         public static class SystemConnections {
-            public const string SQL_DEFINITION =
-                @"CREATE TABLE [dbo].[SystemConnections] (
+            public const string ALIAS = "dbo.SystemConnections",
+                SQL_DEFINITION = @"CREATE TABLE [dbo].[SystemConnections] (
                     [sc_system_1_id] INT NOT NULL,
                     [sc_system_2_id] INT NOT NULL,
                     [sc_travel_cost] INT NOT NULL,
                     PRIMARY KEY ([sc_system_1_id], [sc_system_2_id])
                 )",
-                TABLE_NAME = "dbo.SystemConnections",
                 SYSTEM_START = "sc_system_1_id",
                 SYSTEM_END = "sc_system_2_id",
                 TRAVEL_COST = "sc_travel_cost";
         }
         public static class Planets {
-            public const string SQL_DEFINITION =
-                @"CREATE TABLE [dbo].[Planets] (
+            public const string ALIAS = "dbo.Planets",
+                SQL_DEFINITION = @"CREATE TABLE [dbo].[Planets] (
                     [p_planet_id] INT PRIMARY KEY, 
                     [p_system_id] INT NOT NULL,
+                    [p_seed] INT NOT NULL,
                     [p_radius] DECIMAL(4,2) NOT NULL,
                     [p_offset] DECIMAL(4,2) NOT NULL,
                     [p_size] INT NOT NULL,
@@ -51,10 +78,8 @@ public static class Database {
                     [p_is_habitable] BIT NOT NULL,
                     [p_is_inhabited] BIT NOT NULL,
                     [p_kardashev_level] INT NOT NULL,
-                    [p_economy_type] VARCHAR(10) NOT NULL,
-                    [p_seed] INT NOT NULL
+                    [p_economy_type] VARCHAR(10) NOT NULL
                 )",
-                TABLE_NAME = "dbo.Planets",
                 ID = "p_planet_id",
                 SYSTEM_ID = "p_system_id",
                 SEED = "p_seed",
@@ -69,20 +94,19 @@ public static class Database {
                 ECONOMY_TYPE = "p_economy_type";
         }
         public static class Asteroids {
-            public const string SQL_DEFINITION =
-                @"CREATE TABLE [dbo].[Asteroids] (
+            public const string ALIAS = "dbo.Asteroids",
+                SQL_DEFINITION = @"CREATE TABLE [dbo].[Asteroids] (
                     [a_asteroid_id] INT PRIMARY KEY,
                     [a_system_id] INT NOT NULL,
+                    [a_seed] INT NOT NULL
                     [a_radius] DECIMAL(4,2) NOT NULL,
                     [a_offset] DECIMAL(4,2) NOT NULL,
                     [a_size] INT NOT NULL,
                     [a_density] INT NOT NULL,
                     [a_composition] VARCHAR(20) NOT NULL,
                     [a_is_mineable] BIT NOT NULL,
-                    [a_is_regenerating] BIT NOT NULL,
-                    [a_seed] INT NOT NULL
+                    [a_is_regenerating] BIT NOT NULL
                 )",
-                TABLE_NAME = "dbo.Asteroids",
                 ID = "a_asteroid_id",
                 SYSTEM_ID = "a_system_id",
                 SEED = "a_seed",
@@ -103,7 +127,7 @@ public static class Database {
                     [py_password] VARCHAR(40) NOT NULL,
                     [py_balance] INT NOT NULL
                 )",
-                TABLE_NAME = "dbo.Players",
+                ALIAS = "dbo.Players",
                 ID = "py_player_id",
                 CURRENT_SESSION = "py_current_session",
                 NAME = "py_name",
@@ -119,7 +143,7 @@ public static class Database {
                     [sp_position_x] DECIMAL(4,2) NOT NULL,
                     [sp_position_y] DECIMAL(4,2) NOT NULL
                 )",
-                TABLE_NAME = "dbo.Ships",
+                ALIAS = "dbo.Ships",
                 ID = "sp_ship_id",
                 PLAYER_ID = "sp_player_id",
                 CURRENT_SYSTEM = "sp_current_system",
@@ -136,7 +160,7 @@ public static class Database {
                     [sh_login] DATETIME NULL,
                     [sh_logout] DATETIME NULL
                 )",
-                TABLE_NAME = "dbo.SessionHistory",
+                ALIAS = "dbo.SessionHistory",
                 ID = "sh_session_id",
                 PLAYER_ID = "sh_player_id",
                 LOG_IN_DATE = "sh_login",
@@ -150,7 +174,7 @@ public static class Database {
                     [ch_ship_2_id] INT NULL,
                     [ch_date] DATETIME NULL
                 )",
-                TABLE_NAME = "dbo.CombatHistory",
+                ALIAS = "dbo.CombatHistory",
                 ID = "ch_combat_id",
                 SHIP_AGGRESSOR = "ch_ship_1_id",
                 SHIP_DEFENDER = "ch_ship_2_id",
@@ -165,7 +189,7 @@ public static class Database {
                     [m_date] DATETIME NOT NULL,
                     PRIMARY KEY ([m_ship_id], [m_asteroid_id], [m_date])
                 )",
-                TABLE_NAME = "dbo.Mines",
+                ALIAS = "dbo.Mines",
                 SHIP_ID = "m_ship_id",
                 ASTEROID_ID = "m_asteroid_id",
                 AMOUNT = "m_amount",
@@ -179,7 +203,7 @@ public static class Database {
                     [v_date] DATETIME NOT NULL,
                     PRIMARY KEY ([v_ship_id], [v_planet_id], [v_date])
                 )",
-                TABLE_NAME = "dbo.Visits",
+                ALIAS = "dbo.Visits",
                 SHIP_ID = "v_ship_id",
                 PLANET_ID = "v_planet_id",
                 DATE = "v_date";

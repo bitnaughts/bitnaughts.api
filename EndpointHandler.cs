@@ -60,7 +60,7 @@ namespace BitNaughts {
         [FunctionName ("Lab7MinWarehouseSupplier")] /* API Endpoints: /api/Lab7MinWarehouseSupplier */
         public static async Task<string> Lab7MinWarehouseSupplier ([HttpTrigger (AuthorizationLevel.Anonymous, HTTP.GET, Route = "Lab7MinWarehouseSupplier")] HttpRequest req) {
             try {
-                if (int.Parse(SQLHandler.ExecuteSQLiteQuery(@"
+                if (int.Parse (SQLHandler.ExecuteSQLiteQuery (@"
                     SELECT COUNT(*)
                     FROM supplier
                     LEFT JOIN (
@@ -69,9 +69,8 @@ namespace BitNaughts {
                         GROUP BY w_supplierkey
                     ) w ON w_supplierkey = s_suppkey
                     WHERE sum_warehouses IS NULL
-                ")) > 0)
-                {
-                    return "The supplier with the smallest number of warehouses is " + SQLHandler.ExecuteSQLiteQuery(@"
+                ")) > 0) {
+                    return "The supplier with the smallest number of warehouses is " + SQLHandler.ExecuteSQLiteQuery (@"
                         SELECT s_name
                         FROM supplier
                         LEFT JOIN (
@@ -82,7 +81,7 @@ namespace BitNaughts {
                         WHERE sum_warehouses IS NULL
                     ");
                 }
-                return "The supplier with the smallest number of warehouses is " + SQLHandler.ExecuteSQLiteQuery(@"
+                return "The supplier with the smallest number of warehouses is " + SQLHandler.ExecuteSQLiteQuery (@"
                     SELECT s_name
                     FROM supplier
                     LEFT JOIN (
@@ -226,39 +225,39 @@ namespace BitNaughts {
                 /* Reads data into table and returns transaction receipt */
                 switch (req.Query[HTTP.Endpoints.Parameters.FLAG]) {
                     case HTTP.Endpoints.Parameters.Values.RESET:
-                        
+
                         /* Pulls galaxy JSON from HTTP Body */
                         dynamic galaxy = await GetBody (req.Body);
 
                         /* Initializing Table Values */
-                        Dictionary<string, List<string>> values = new Dictionary<string, List<string>> { { Database.Tables.Galaxies.TABLE_NAME, new List<string> () },
-                            { Database.Tables.Systems.TABLE_NAME, new List<string> () },
-                            { Database.Tables.SystemConnections.TABLE_NAME, new List<string> () },
-                            { Database.Tables.Planets.TABLE_NAME, new List<string> () },
-                            { Database.Tables.Asteroids.TABLE_NAME, new List<string> () }
+                        Dictionary<string, List<string>> values = new Dictionary<string, List<string>> { { Database.Tables.Galaxies.ALIAS, new List<string> () },
+                            { Database.Tables.Systems.ALIAS, new List<string> () },
+                            { Database.Tables.SystemConnections.ALIAS, new List<string> () },
+                            { Database.Tables.Planets.ALIAS, new List<string> () },
+                            { Database.Tables.Asteroids.ALIAS, new List<string> () }
                         };
 
                         /* Agregrates Table Values */
-                        values[Database.Tables.Galaxies.TABLE_NAME].Add (WrapValues (new string[] {
+                        values[Database.Tables.Galaxies.ALIAS].Add (WrapValues (new string[] {
                             galaxy.id, galaxy.seed
                         }));
                         foreach (dynamic system in galaxy.systems) {
-                            values[Database.Tables.Systems.TABLE_NAME].Add (WrapValues (new string[] {
+                            values[Database.Tables.Systems.ALIAS].Add (WrapValues (new string[] {
                                 system.id, galaxy.id, system.seed, system.position_x, system.position_y
                             }));
-                            values[Database.Tables.SystemConnections.TABLE_NAME].AddRange (((IEnumerable<dynamic>) system.connected_systems).Select (
+                            values[Database.Tables.SystemConnections.ALIAS].AddRange (((IEnumerable<dynamic>) system.connected_systems).Select (
                                 connected_system => WrapValues (new string[] {
-                                    system.id, connected_system
+                                    system.id, connected_system, "1"
                                 })
                             ));
-                            values[Database.Tables.Planets.TABLE_NAME].AddRange (((IEnumerable<dynamic>) system.planets).Select (
+                            values[Database.Tables.Planets.ALIAS].AddRange (((IEnumerable<dynamic>) system.planets).Select (
                                 planet => WrapValues (new string[] {
-                                    planet.id, system.id, planet.seed
+                                    planet.id, system.id, planet.seed, planet.radius, planet.offset, planet.size, planet.density, planet.composition, planet.is_habitable, planet.is_inhabited, planet.kardashev_level, planet.economy_type
                                 })
                             ));
-                            values[Database.Tables.Asteroids.TABLE_NAME].AddRange (((IEnumerable<dynamic>) system.asteroids).Select (
+                            values[Database.Tables.Asteroids.ALIAS].AddRange (((IEnumerable<dynamic>) system.asteroids).Select (
                                 asteroid => WrapValues (new string[] {
-                                    asteroid.id, system.id, asteroid.seed, asteroid.size
+                                    asteroid.id, system.id, asteroid.seed, asteroid.radius, asteroid.offset, asteroid.size, asteroid.density, asteroid.composition, asteroid.is_mineable, asteroid.is_regenerating
                                 })
                             ));
                         }
@@ -280,12 +279,12 @@ namespace BitNaughts {
                 string id = req.Query[HTTP.Endpoints.Parameters.ID];
 
                 switch (type) {
-                    case Database.Tables.Galaxies.TABLE_NAME:
+                    case Database.Tables.Galaxies.ALIAS:
 
                         // string galaxy_serialized = 
 
                         SQLHandler.Select (new Dictionary<string, string> { { SQL.COLUMNS, SQL.ALL },
-                            { SQL.TABLE, Database.Tables.Galaxies.TABLE_NAME },
+                            { SQL.TABLE, Database.Tables.Galaxies.ALIAS },
                             { SQL.CONDITION, Database.Tables.Galaxies.ID + SQL.EQUALS + id }
                         });
 
@@ -344,33 +343,8 @@ namespace BitNaughts {
         public static async Task<string> Reset ([HttpTrigger (AuthorizationLevel.Anonymous, HTTP.GET, Route = HTTP.Endpoints.RESET)] HttpRequest req) {
             try {
                 /* Drops old tables and creates new ones with updated fields */
-                return SQLHandler.Drop (
-                    new string[] {
-                        Database.Tables.Galaxies.TABLE_NAME,
-                            Database.Tables.Systems.TABLE_NAME,
-                            Database.Tables.SystemConnections.TABLE_NAME,
-                            Database.Tables.Planets.TABLE_NAME,
-                            Database.Tables.Asteroids.TABLE_NAME,
-                            Database.Tables.Ships.TABLE_NAME,
-                            Database.Tables.SessionHistory.TABLE_NAME,
-                            Database.Tables.CombatHistory.TABLE_NAME,
-                            Database.Tables.Mines.TABLE_NAME,
-                            Database.Tables.Visits.TABLE_NAME
-                    }
-                ) + SQLHandler.Create (
-                    new string[] {
-                        Database.Tables.Galaxies.SQL_DEFINITION,
-                            Database.Tables.Systems.SQL_DEFINITION,
-                            Database.Tables.SystemConnections.SQL_DEFINITION,
-                            Database.Tables.Planets.SQL_DEFINITION,
-                            Database.Tables.Asteroids.SQL_DEFINITION,
-                            Database.Tables.Ships.SQL_DEFINITION,
-                            Database.Tables.SessionHistory.SQL_DEFINITION,
-                            Database.Tables.CombatHistory.SQL_DEFINITION,
-                            Database.Tables.Mines.SQL_DEFINITION,
-                            Database.Tables.Visits.SQL_DEFINITION
-                    }
-                );
+                return SQLHandler.Drop (Database.ALL_TABLES) + SQLHandler.Create (Database.ALL_TABLE_DEFINITIONS);
+
             } catch (Exception ex) {
                 return ex.ToString ();
             }
