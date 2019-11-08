@@ -5,7 +5,7 @@ public static class Database {
             public const string SQL_DEFINITION =
                 @"CREATE TABLE [dbo].[Galaxies] (
                     [g_galaxy_id] INT PRIMARY KEY,
-                    [g_seed] INT NULL
+                    [g_seed] INT NOT NULL
                 )",
                 TABLE_NAME = "dbo.Galaxies",
                 ID = "g_galaxy_id",
@@ -15,10 +15,10 @@ public static class Database {
             public const string SQL_DEFINITION =
                 @"CREATE TABLE [dbo].[Systems] (
                     [s_system_id] INT PRIMARY KEY,
-                    [s_galaxy_id] INT NULL,
-                    [s_seed] INT NULL,
-                    [s_position_x] DECIMAL(5,2) NULL,
-                    [s_position_y] DECIMAL(5,2) NULL
+                    [s_galaxy_id] INT NOT NULL,
+                    [s_seed] INT NOT NULL,
+                    [s_position_x] DECIMAL(4,2) NOT NULL,
+                    [s_position_y] DECIMAL(4,2) NOT NULL
                 )",
                 TABLE_NAME = "dbo.Systems",
                 ID = "s_system_id",
@@ -30,7 +30,7 @@ public static class Database {
                 @"CREATE TABLE [dbo].[SystemConnections] (
                     [sc_system_1_id] INT NOT NULL,
                     [sc_system_2_id] INT NOT NULL,
-                    [sc_travel_cost] INT NULL,
+                    [sc_travel_cost] INT NOT NULL,
                     PRIMARY KEY ([sc_system_1_id], [sc_system_2_id])
                 )",
                 TABLE_NAME = "dbo.SystemConnections",
@@ -42,17 +42,17 @@ public static class Database {
             public const string SQL_DEFINITION =
                 @"CREATE TABLE [dbo].[Planets] (
                     [p_planet_id] INT PRIMARY KEY, 
-                    [p_system_id] INT NULL,
-                    [p_radius] DECIMAL(5,2) NULL,
-                    [p_offset] DECIMAL(5,2) NULL,
-                    [p_size] INT NULL,
-                    [p_density] INT NULL,
-                    [p_composition] VARCHAR(20) NULL,
-                    [p_is_habitable] BIT NULL,
-                    [p_is_inhabited] BIT NULL,
-                    [p_kardashev_level] INT NULL,
-                    [p_economy_type] VARCHAR(10) NULL,
-                    [p_seed] INT NULL
+                    [p_system_id] INT NOT NULL,
+                    [p_radius] DECIMAL(4,2) NOT NULL,
+                    [p_offset] DECIMAL(4,2) NOT NULL,
+                    [p_size] INT NOT NULL,
+                    [p_density] INT NOT NULL,
+                    [p_composition] VARCHAR(20) NOT NULL,
+                    [p_is_habitable] BIT NOT NULL,
+                    [p_is_inhabited] BIT NOT NULL,
+                    [p_kardashev_level] INT NOT NULL,
+                    [p_economy_type] VARCHAR(10) NOT NULL,
+                    [p_seed] INT NOT NULL
                 )",
                 TABLE_NAME = "dbo.Planets",
                 ID = "p_planet_id",
@@ -72,15 +72,15 @@ public static class Database {
             public const string SQL_DEFINITION =
                 @"CREATE TABLE [dbo].[Asteroids] (
                     [a_asteroid_id] INT PRIMARY KEY,
-                    [a_system_id] INT NULL,
-                    [a_radius] DECIMAL(5,2) NULL,
-                    [a_offset] DECIMAL(5,2) NULL,
-                    [a_size] INT NULL,
-                    [a_density] INT NULL,
-                    [a_composition] VARCHAR(20) NULL,
-                    [a_is_mineable] BIT NULL,
-                    [a_is_regenerating] BIT NULL,
-                    [a_seed] INT NULL
+                    [a_system_id] INT NOT NULL,
+                    [a_radius] DECIMAL(4,2) NOT NULL,
+                    [a_offset] DECIMAL(4,2) NOT NULL,
+                    [a_size] INT NOT NULL,
+                    [a_density] INT NOT NULL,
+                    [a_composition] VARCHAR(20) NOT NULL,
+                    [a_is_mineable] BIT NOT NULL,
+                    [a_is_regenerating] BIT NOT NULL,
+                    [a_seed] INT NOT NULL
                 )",
                 TABLE_NAME = "dbo.Asteroids",
                 ID = "a_asteroid_id",
@@ -98,10 +98,10 @@ public static class Database {
             public const string SQL_DEFINITION =
                 @"CREATE TABLE [dbo].[Players] (
                     [py_player_id] INT PRIMARY KEY,
-                    [py_current_session] INT NULL,
-                    [py_name] VARCHAR(50) NULL,
-                    [py_password] VARCHAR(50) NULL,
-                    [py_balance] INT NULL
+                    [py_current_session] INT NOT NULL,
+                    [py_name] VARCHAR(40) NOT NULL,
+                    [py_password] VARCHAR(40) NOT NULL,
+                    [py_balance] INT NOT NULL
                 )",
                 TABLE_NAME = "dbo.Players",
                 ID = "py_player_id",
@@ -113,18 +113,18 @@ public static class Database {
             public const string SQL_DEFINITION =
                 @"CREATE TABLE [dbo].[Ships] (
                     [sp_ship_id] INT PRIMARY KEY,
-                    [sp_player_id] INT NULL,
-                    [sp_name] VARCHAR(50) NULL,
-                    [sp_health] INT NULL,
-                    [sp_position_x] DECIMAL(5,2) NULL,
-                    [sp_position_y] DECIMAL(5,2) NULL
+                    [sp_player_id] INT NOT NULL,
+                    [sp_name] VARCHAR(40) NOT NULL,
+                    [sp_data] VARCHAR(MAX) NOT NULL,
+                    [sp_position_x] DECIMAL(4,2) NOT NULL,
+                    [sp_position_y] DECIMAL(4,2) NOT NULL
                 )",
                 TABLE_NAME = "dbo.Ships",
                 ID = "sp_ship_id",
                 PLAYER_ID = "sp_player_id",
                 CURRENT_SYSTEM = "sp_current_system",
                 NAME = "sp_name",
-                HEALTH = "sp_health",
+                DATA = "sp_data",
                 POSITION_X = "sp_position_x",
                 POSITION_Y = "sp_position_y";
         }
@@ -191,7 +191,7 @@ public static class Warehouse {
     public const string SQL_DEFINITION =
         @"CREATE TABLE warehouse (
             w_warehousekey decimal(3,0) not null,
-            w_name char(25) not null,
+            w_name char(24) not null,
             w_supplierkey decimal(2,0) not null,
             w_capacity decimal(6,2) not null,
             w_address varchar(40) not null,
