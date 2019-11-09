@@ -252,12 +252,12 @@ namespace BitNaughts {
                             ));
                             values[Database.Tables.Planets.ALIAS].AddRange (((IEnumerable<dynamic>) system.planets).Select (
                                 planet => WrapValues (new string[] {
-                                    planet.id, system.id, planet.seed, planet.radius, planet.offset, planet.size, planet.density, planet.composition, planet.is_habitable, planet.is_inhabited, planet.kardashev_level, planet.economy_type
+                                    planet.id, system.id, planet.seed, planet.radius, planet.theta, planet.size, planet.density, planet.composition, planet.is_habitable, planet.is_inhabited, planet.kardashev_level, planet.economy_type
                                 })
                             ));
                             values[Database.Tables.Asteroids.ALIAS].AddRange (((IEnumerable<dynamic>) system.asteroids).Select (
                                 asteroid => WrapValues (new string[] {
-                                    asteroid.id, system.id, asteroid.seed, asteroid.radius, asteroid.offset, asteroid.size, asteroid.density, asteroid.composition, asteroid.is_mineable, asteroid.is_regenerating
+                                    asteroid.id, system.id, asteroid.seed, asteroid.radius, asteroid.theta, asteroid.size, asteroid.density, asteroid.composition, asteroid.is_mineable, asteroid.is_regenerating
                                 })
                             ));
                         }
