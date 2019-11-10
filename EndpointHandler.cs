@@ -223,7 +223,24 @@ namespace BitNaughts {
         public static async Task<string> Set ([HttpTrigger (AuthorizationLevel.Anonymous, HTTP.POST, Route = HTTP.Endpoints.SET)] HttpRequest req) {
             try {
                 /* Reads data into table and returns transaction receipt */
-                switch (req.Query[HTTP.Endpoints.Parameters.FLAG]) {
+                string flag = req.Query[HTTP.Endpoints.Parameters.FLAG];
+                string table = req.Query[HTTP.Endpoints.Parameters.TABLE];
+
+                switch (flag) {
+                    case HTTP.Endpoints.Parameters.Values.ADD:
+                        switch (table) {
+                            case Database.Tables.Ships.ALIAS:
+                                dynamic ship = await GetBody (req.Body);
+                                return SQLHandler.Insert (
+                                    Database.Tables.Ships.ALIAS,
+                                    new List<string> () {
+                                        WrapValues (new string[] {
+                                            ship.id, ship.player_id, ship.current_system, ship.name, ship.data, ship.position_x, ship.position_y
+                                        })
+                                    }
+                                );
+                        }
+                        break;
                     case HTTP.Endpoints.Parameters.Values.RESET:
 
                         /* Pulls galaxy JSON from HTTP Body */
@@ -267,7 +284,7 @@ namespace BitNaughts {
             } catch (Exception ex) {
                 return ex.ToString ();
             }
-            return new InvalidOperationException ().ToString ();
+            return new InvalidOperationException ().ToString (); /* InvalidOperationException returned if attempting to add a value not supported yet */
         }
 
         [FunctionName (HTTP.Endpoints.MINE)] /* API Endpoints: /api/mine?asteroid=12&ship=5&amount=44&date=352423523 */
@@ -296,7 +313,7 @@ namespace BitNaughts {
                         { SQL.COLUMN, Database.Tables.Ships.DATA },
                         { SQL.VALUE, mined_amount.ToString ("F") }
                     });
-                /* Asteroid was fully depleted when mined */
+                    /* Asteroid was fully depleted when mined */
                 } else if (asteroid_size == mined_amount) {
                     /* Delete asteroid, give all size to ship */
                     return SQLHandler.Delete (new Dictionary<string, string> { { Database.Tables.Asteroids.ALIAS, SQL.IsEqual (Database.Tables.Asteroids.ID, asteroid) } }) +
@@ -321,10 +338,13 @@ namespace BitNaughts {
                 string id = req.Query[HTTP.Endpoints.Parameters.ID];
 
                 switch (type) {
+                    case Database.Tables.Ships.ALIAS:
+                        return SQLHandler.Select (new Dictionary<string, string> { { SQL.COLUMNS, SQL.ALL },
+                            { SQL.TABLE, Database.Tables.Ships.ALIAS },
+                            { SQL.CONDITION, Database.Tables.Ships.ID + SQL.EQUALS + id }
+                        });
+
                     case Database.Tables.Galaxies.ALIAS:
-
-                        // string galaxy_serialized = 
-
                         SQLHandler.Select (new Dictionary<string, string> { { SQL.COLUMNS, SQL.ALL },
                             { SQL.TABLE, Database.Tables.Galaxies.ALIAS },
                             { SQL.CONDITION, Database.Tables.Galaxies.ID + SQL.EQUALS + id }
@@ -347,22 +367,22 @@ namespace BitNaughts {
             return new InvalidOperationException ().ToString ();
         }
 
-        [FunctionName (HTTP.Endpoints.UPDATE)] /* API Endpoint: /api/update?table=players */
+        [FunctionName (HTTP.Endpoints.UPDATE)] /* API Endpoint: /api/update?table=dbo.Ships */
         public static async Task<string> Update ([HttpTrigger (AuthorizationLevel.Anonymous, HTTP.PUT, Route = HTTP.Endpoints.UPDATE)] HttpRequest req) {
-
-            // /* Overrides data in table and returns transaction receipt */
-            // dynamic req_body = await GetBody (req.Body);
-            // return ExecuteNonQuery (
-            //     String.Format (
-            //         "UPDATE dbo.{0} SET {1} WHERE {2}", /* SQL Query to be executed */
-            //         req.Query["table"],
-            //         String.Join (
-            //             FileFormat.DELIMITER,
-            //             req_body.values.ToObject<string[]> ()
-            //         ),
-            //         req_body.condition
-            //     )
-            // );
+            try {
+                /* Overrides data in table and returns transaction receipt */
+                /* Idempotent... */
+                string table = req.Query[HTTP.Endpoints.Parameters.FLAG];
+                switch (table) {
+                    case Database.Tables.Ships.ALIAS:
+                        dynamic ship = await GetBody (req.Body);
+                        // return SQLHandler.Update (
+                        // );
+                        break;
+                }
+            } catch (Exception ex) {
+                return ex.ToString ();
+            }
             return new InvalidOperationException ().ToString ();
         }
 

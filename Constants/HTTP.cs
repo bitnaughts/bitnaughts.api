@@ -3,7 +3,7 @@ public static class HTTP {
         POST = "post",
         DELETE = "delete",
         PUT = "put";
-        
+
     public static class Endpoints {
         public const string GET = "get",
             SET = "set",
@@ -13,6 +13,7 @@ public static class HTTP {
 
         public static class Parameters {
             public const string FLAG = "flag",
+                TABLE = "table",
                 TYPE = "type",
                 ID = "id",
                 ASTEROID = "asteroid",
@@ -22,6 +23,7 @@ public static class HTTP {
 
             public static class Values {
                 public const string RESET = "reset",
+                    ADD = "add",
                     TYPE = "type",
                     ID = "id";
             }
