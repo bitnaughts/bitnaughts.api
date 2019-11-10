@@ -98,7 +98,7 @@ public static class Database {
                 SQL_DEFINITION = @"CREATE TABLE [dbo].[Asteroids] (
                     [a_asteroid_id] INT PRIMARY KEY,
                     [a_system_id] INT NOT NULL,
-                    [a_seed] INT NOT NULL
+                    [a_seed] INT NOT NULL,
                     [a_radius] DECIMAL(4,2) NOT NULL,
                     [a_theta] DECIMAL(4,2) NOT NULL,
                     [a_size] DECIMAL(4,2) NOT NULL,
