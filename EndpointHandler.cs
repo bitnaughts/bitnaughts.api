@@ -290,8 +290,8 @@ namespace BitNaughts {
         [FunctionName (HTTP.Endpoints.MINE)] /* API Endpoints: /api/mine?asteroid=12&ship=5&amount=44&date=352423523 */
         public static async Task<string> Mine ([HttpTrigger (AuthorizationLevel.Anonymous, HTTP.POST, Route = HTTP.Endpoints.MINE)] HttpRequest req) {
             try {
-                string asteroid = req.Query[HTTP.Endpoints.Parameters.ASTEROID];
-                string ship = req.Query[HTTP.Endpoints.Parameters.SHIP];
+                string asteroid = req.Query[HTTP.Endpoints.Parameters.ASTEROID].ToString();
+                string ship = req.Query[HTTP.Endpoints.Parameters.SHIP].ToString();
                 double mined_amount = double.Parse (req.Query[HTTP.Endpoints.Parameters.AMOUNT]);
 
                 /* Gets current asteroid size to determine if mining fully depleted asteroid */
