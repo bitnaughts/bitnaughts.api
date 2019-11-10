@@ -363,7 +363,12 @@ namespace BitNaughts {
 
         /* Abstracting SQL Values to string array  */
         public static string WrapValues (string[] values) {
-            return "(" + String.Join (SQL.Format.DELIMITER, values) + ")";
+            return "(" + String.Join (SQL.Format.DELIMITER, values.Select(value => WrapValue(value))) + ")";
+        }
+        /* Checking if value is non-numeric to add ''s */
+        float value_numeric = 0;
+        public static string WrapValue(string value) {
+            return float.TryParse(value, out value_numeric) ? value : "'" + value + "'";
         }
     }
 }
