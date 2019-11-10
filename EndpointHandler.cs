@@ -270,6 +270,48 @@ namespace BitNaughts {
             return new InvalidOperationException ().ToString ();
         }
 
+        [FunctionName (HTTP.Endpoints.MINE)] /* API Endpoints: /api/mine?asteroid=12&ship=5&amount=44&date=352423523 */
+        public static async Task<string> Mine ([HttpTrigger (AuthorizationLevel.Anonymous, HTTP.POST, Route = HTTP.Endpoints.MINE)] HttpRequest req) {
+            try {
+                string asteroid = req.Query[HTTP.Endpoints.Parameters.ASTEROID];
+                string ship = req.Query[HTTP.Endpoints.Parameters.SHIP];
+                double mined_amount = double.Parse (req.Query[HTTP.Endpoints.Parameters.AMOUNT]);
+
+                /* Gets current asteroid size to determine if mining fully depleted asteroid */
+                double asteroid_size = double.Parse (
+                    SQLHandler.Select (new Dictionary<string, string> { { SQL.TABLE, Database.Tables.Asteroids.ALIAS },
+                        { SQL.COLUMNS, Database.Tables.Asteroids.SIZE },
+                        { SQL.CONDITION, SQL.IsEqual (Database.Tables.Asteroids.ID, asteroid) }
+                    })
+                );
+                /* Asteroid was not fully mined */
+                if (asteroid_size > mined_amount) {
+                    /* Reduce size of asteroid and pass to ship */
+                    return SQLHandler.Update (new Dictionary<string, string> { { SQL.TABLE, Database.Tables.Asteroids.ALIAS },
+                        { SQL.CONDITION, SQL.IsEqual (Database.Tables.Asteroids.ID, asteroid) },
+                        { SQL.COLUMN, Database.Tables.Asteroids.SIZE },
+                        { SQL.VALUE, (asteroid_size - mined_amount).ToString ("F") }
+                    }) + SQLHandler.Update (new Dictionary<string, string> { { SQL.TABLE, Database.Tables.Ships.ALIAS },
+                        { SQL.CONDITION, SQL.IsEqual (Database.Tables.Ships.ID, ship) },
+                        { SQL.COLUMN, Database.Tables.Ships.DATA },
+                        { SQL.VALUE, mined_amount.ToString ("F") }
+                    });
+                /* Asteroid was fully depleted when mined */
+                } else if (asteroid_size == mined_amount) {
+                    /* Delete asteroid, give all size to ship */
+                    return SQLHandler.Delete (new Dictionary<string, string> { { Database.Tables.Asteroids.ALIAS, SQL.IsEqual (Database.Tables.Asteroids.ID, asteroid) } }) +
+                        SQLHandler.Update (new Dictionary<string, string> { { SQL.TABLE, Database.Tables.Ships.ALIAS },
+                            { SQL.CONDITION, SQL.IsEqual (Database.Tables.Ships.ID, ship) },
+                            { SQL.COLUMN, Database.Tables.Ships.DATA },
+                            { SQL.VALUE, mined_amount.ToString ("F") }
+                        });
+                }
+            } catch (Exception ex) {
+                return ex.ToString ();
+            }
+            return new InvalidOperationException ().ToString (); /* InvalidOperationException returned if attempting to mine more than asteroid has */
+        }
+
         [FunctionName (HTTP.Endpoints.GET)] /* API Endpoint: /api/get?table=players&fields=* */
         public static async Task<string> Get ([HttpTrigger (AuthorizationLevel.Anonymous, HTTP.GET, Route = HTTP.Endpoints.GET)] HttpRequest req) {
             try {
@@ -363,12 +405,12 @@ namespace BitNaughts {
 
         /* Abstracting SQL Values to string array  */
         public static string WrapValues (string[] values) {
-            return "(" + String.Join (SQL.Format.DELIMITER, values.Select(value => WrapValue(value))) + ")";
+            return "(" + String.Join (SQL.Format.DELIMITER, values.Select (value => WrapValue (value))) + ")";
         }
         /* Checking if value is non-numeric to add ''s */
         static float value_numeric = 0;
-        public static string WrapValue(string value) {
-            return float.TryParse(value, out value_numeric) ? value : "'" + value + "'";
+        public static string WrapValue (string value) {
+            return float.TryParse (value, out value_numeric) ? value : "'" + value + "'";
         }
     }
 }
