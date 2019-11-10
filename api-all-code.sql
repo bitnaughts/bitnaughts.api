@@ -1,4 +1,8 @@
--- api/set&flag=reset
+-- api/set?flag=add&table=dbo.ships
+
+INSERT INTO dbo.Ships VALUES (0,1,1,'ShipX','',4.24,2.42);
+
+-- api/set?flag=reset
 
 -- Deletion Commands executed by set&flag=reset
 DELETE FROM dbo.Galaxies;

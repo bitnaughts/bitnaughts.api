@@ -1,10 +1,14 @@
--- Deletion Commands executed by set&flag=reset
+-- api/set?flag=add&table=dbo.ships
+
+INSERT INTO dbo.Ships VALUES (0,1,1,'ShipX','',4.24,2.42);
+
+-- Deletion Commands executed by set?flag=reset
 DELETE FROM dbo.Galaxies;
 DELETE FROM dbo.Systems;
 DELETE FROM dbo.SystemConnections;
 DELETE FROM dbo.Planets;
 DELETE FROM dbo.Asteroids;
--- Insertion Commands excuted by set&flag=reset
+-- Insertion Commands excuted by set?flag=reset
 INSERT INTO dbo.Galaxies
 VALUES
     (0, 10);
