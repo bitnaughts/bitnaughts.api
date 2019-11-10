@@ -138,6 +138,7 @@ public static class Database {
                 @"CREATE TABLE dbo.Ships (
                     sp_ship_id INT PRIMARY KEY,
                     sp_player_id INT NOT NULL,
+                    sp_current_system INT NOT NULL,
                     sp_name VARCHAR(40) NOT NULL,
                     sp_data VARCHAR(MAX) NOT NULL,
                     sp_position_x DECIMAL(4,2) NOT NULL,
