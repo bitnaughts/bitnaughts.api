@@ -72,13 +72,13 @@ public static class Database {
                     [p_seed] INT NOT NULL,
                     [p_radius] DECIMAL(4,2) NOT NULL,
                     [p_theta] DECIMAL(4,2) NOT NULL,
-                    [p_size] INT NOT NULL,
-                    [p_density] INT NOT NULL,
+                    [p_size] DECIMAL(4,2) NOT NULL,
+                    [p_density] DECIMAL(4,2) NOT NULL,
                     [p_composition] VARCHAR(20) NOT NULL,
                     [p_is_habitable] BIT NOT NULL,
                     [p_is_inhabited] BIT NOT NULL,
-                    [p_kardashev_level] INT NOT NULL,
-                    [p_economy_type] VARCHAR(10) NOT NULL
+                    [p_kardashev_level] DECIMAL(4,2) NOT NULL,
+                    [p_economy_type] VARCHAR(100) NOT NULL
                 )",
                 ID = "p_planet_id",
                 SYSTEM_ID = "p_system_id",
@@ -101,8 +101,8 @@ public static class Database {
                     [a_seed] INT NOT NULL
                     [a_radius] DECIMAL(4,2) NOT NULL,
                     [a_theta] DECIMAL(4,2) NOT NULL,
-                    [a_size] INT NOT NULL,
-                    [a_density] INT NOT NULL,
+                    [a_size] DECIMAL(4,2) NOT NULL,
+                    [a_density] DECIMAL(4,2) NOT NULL,
                     [a_composition] VARCHAR(20) NOT NULL,
                     [a_is_mineable] BIT NOT NULL,
                     [a_is_regenerating] BIT NOT NULL
