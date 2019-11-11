@@ -1,10 +1,48 @@
--- api/session
+---------------------------
+-- MISCELLANEOUS QUERIES --
+---------------------------
 
+-- get number of players currently online
+SELECT COUNT(*)
+FROM dbo.Players
+WHERE py_current_sesson > -1;
 
+-- get names of ships who have started a fight with another ship
+SELECT sh_name
+FROM dbo.Ships INNER JOIN ( 
+    SELECT ch_ship_1
+    FROM dbo.CombatHistory
+) ch ON ch_ship_1 = sh_ship_id;
+
+-- get asteroids and their average size that have been mined before but are not completely destroyed
+SELECT a_asteroid_id, AVG(a_size)
+FROM dbo.Asteroids
+INNER JOIN (
+    SELECT m_asteroid_id
+    FROM dbo.Mines
+) m ON m_asteroid_id = a_asteroid_id
+
+--------------------------
+-- API ENDPOINT QUERIES --
+--------------------------
+
+-- api/login?player=1
+
+UPDATE dbo.Players SET py_current_session = 0 WHERE py_player_id = 1;
+INSERT INTO dbo.SessionHistory
+VALUES
+    (0, 1, '2019-11-11 07:25:05.752', NULL);
+
+-- api/logout?player=1
+
+UPDATE dbo.Players SET py_current_session = -1 WHERE py_player_id = 1;
+UPDATE dbo.SessionHistory SET sh_logout = '2019-11-11 07:26:09.714' WHERE sh_session_id = 1;
 
 -- api/fight?ship_1=0&ship_2=1
 
-INSERT INTO dbo.CombatHistory VALUES (0,0,1,'2019-11-11 06:10:56.520')
+INSERT INTO dbo.CombatHistory
+VALUES
+    (0, 0, 1, '2019-11-11 06:10:56.520')
 
 -- api/visit?planet=12&ship=0
 
