@@ -287,6 +287,33 @@ namespace BitNaughts {
             return new InvalidOperationException ().ToString (); /* InvalidOperationException returned if attempting to add a value not supported yet */
         }
 
+        [FunctionName (HTTP.Endpoints.FIGHT)] /* API Endpoints: /api/visit?planet=12&ship=5 */
+        public static async Task<string> FIGHT ([HttpTrigger (AuthorizationLevel.Anonymous, HTTP.POST, Route = HTTP.Endpoints.FIGHT)] HttpRequest req) {
+            try {
+                string ship_aggressor = req.Query[HTTP.Endpoints.Parameters.SHIP_1];
+                string ship_defender = req.Query[HTTP.Endpoints.Parameters.SHIP_2];
+
+                int combat_id = SQLHandler.Select (new Dictionary<string, string> { { SQL.TABLE, Database.Tables.CombatHistory.ALIAS },
+                    { SQL.COLUMNS, SQL.COUNT }
+                });
+
+                return SQLHandler.Insert (
+                    Database.Tables.CombatHistory.ALIAS,
+                    new List<string> () {
+                        WrapValues (new string[] {
+                            combat_id,
+                            ship_aggressor,
+                            ship_defender,
+                            DateTime.UtcNow.ToString (SQL.Format.DATETIME)
+                        })
+                    }
+                );
+            } catch (Exception ex) {
+                return ex.ToString ();
+            }
+            return new InvalidOperationException ().ToString (); /* InvalidOperationException returned if attempting to mine more than asteroid has */
+        }
+
         [FunctionName (HTTP.Endpoints.VISIT)] /* API Endpoints: /api/visit?planet=12&ship=5 */
         public static async Task<string> Visit ([HttpTrigger (AuthorizationLevel.Anonymous, HTTP.POST, Route = HTTP.Endpoints.VISIT)] HttpRequest req) {
             try {

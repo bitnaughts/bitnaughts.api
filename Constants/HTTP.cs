@@ -12,7 +12,8 @@ public static class HTTP {
             UPDATE = "update",
             RESET = "reset",
             MINE = "mine",
-            VISIT = "visit";
+            VISIT = "visit",
+            FIGHT = "fight";
 
         public static class Parameters {
             public const string FLAG = "flag",
@@ -22,6 +23,8 @@ public static class HTTP {
                 PLANET = "planet",
                 ASTEROID = "asteroid",
                 SHIP = "ship",
+                SHIP_1 = "ship_1",
+                SHIP_2 = "ship_2",
                 AMOUNT = "amount",
                 DATE = "date";
 

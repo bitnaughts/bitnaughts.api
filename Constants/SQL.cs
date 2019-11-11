@@ -16,7 +16,8 @@ public static class SQL {
     public const string COLUMNS = "columns",
         COLUMN = "column",
         VALUE = "value",
-        ALL = "*";
+        ALL = "*",
+        COUNT = "COUNT(*)");
 
     /* TABLE NAMES */
     public const string TABLE = "table";
