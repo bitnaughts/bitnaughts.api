@@ -295,10 +295,12 @@ namespace BitNaughts {
 
                 return SQLHandler.Insert (
                     Database.Tables.Visits.ALIAS,
-                    new List<string> {
-                        ship,
-                        planet,
-                        DateTime.UtcNow.ToString(SQL.Format.DATETIME)
+                    new List<string> () {
+                        WrapValues (new string[] {
+                            ship,
+                            planet,
+                            DateTime.UtcNow.ToString (SQL.Format.DATETIME)
+                        })
                     }
                 );
             } catch (Exception ex) {
@@ -333,11 +335,13 @@ namespace BitNaughts {
                             { SQL.VALUE, mined_amount.ToString ("F") }
                         }) + SQLHandler.Insert (
                             Database.Tables.Mines.ALIAS,
-                            new List<string> {
-                                ship,
-                                asteroid,
-                                mined_amount.ToString ("F"),
-                                DateTime.UtcNow.ToString(SQL.Format.DATETIME)
+                            new List<string> () {
+                                WrapValues (new string[] {
+                                    ship,
+                                    asteroid,
+                                    mined_amount.ToString ("F"),
+                                    DateTime.UtcNow.ToString (SQL.Format.DATETIME)
+                                })
                             }
                         );
                         /* Asteroid was fully depleted when mined */
@@ -350,11 +354,13 @@ namespace BitNaughts {
                                 { SQL.VALUE, mined_amount.ToString ("F") }
                             }) + SQLHandler.Insert (
                                 Database.Tables.Mines.ALIAS,
-                                new List<string> {
-                                    ship,
-                                    asteroid,
-                                    mined_amount.ToString ("F"),
-                                    DateTime.UtcNow.ToString ()
+                                new List<string> () {
+                                    WrapValues (new string[] {
+                                        ship,
+                                        asteroid,
+                                        mined_amount.ToString ("F"),
+                                        DateTime.UtcNow.ToString (SQL.Format.DATETIME)
+                                    })
                                 }
                             );
                     }
