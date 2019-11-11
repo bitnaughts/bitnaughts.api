@@ -287,8 +287,62 @@ namespace BitNaughts {
             return new InvalidOperationException ().ToString (); /* InvalidOperationException returned if attempting to add a value not supported yet */
         }
 
+        [FunctionName (HTTP.Endpoints.LOGIN)] /* API Endpoints: /api/login?player=1 */
+        public static async Task<string> Login ([HttpTrigger (AuthorizationLevel.Anonymous, HTTP.POST, Route = HTTP.Endpoints.LOGIN)] HttpRequest req) {
+            try {
+                string player = req.Query[HTTP.Endpoints.Parameters.PLAYER];
+
+                string session_id = SQLHandler.Select (new Dictionary<string, string> { { SQL.TABLE, Database.Tables.SessionHistory.ALIAS },
+                    { SQL.COLUMNS, SQL.COUNT }
+                });
+
+                return SQLHandler.Update (new Dictionary<string, string> { { SQL.TABLE, Database.Tables.Players.ALIAS },
+                    { SQL.CONDITION, SQL.IsEqual (Database.Tables.Players.ID, player) },
+                    { SQL.COLUMN, Database.Tables.Players.CURRENT_SESSION },
+                    { SQL.VALUE, session_id }
+                }) + SQLHandler.Insert (
+                    Database.Tables.SessionHistory.ALIAS,
+                    new List<string> () {
+                        WrapValues (new string[] {
+                            session_id,
+                            player,
+                            DateTime.UtcNow.ToString (SQL.Format.DATETIME)
+                        })
+                    }
+                );
+
+            } catch (Exception ex) {
+                return ex.ToString ();
+            }
+            return new InvalidOperationException ().ToString (); /* InvalidOperationException returned if attempting to mine more than asteroid has */
+        }
+
+        [FunctionName (HTTP.Endpoints.LOGOUT)] /* API Endpoints: /api/logout?player=1 */
+        public static async Task<string> Logout ([HttpTrigger (AuthorizationLevel.Anonymous, HTTP.POST, Route = HTTP.Endpoints.LOGOUT)] HttpRequest req) {
+            try {
+                string player = req.Query[HTTP.Endpoints.Parameters.PLAYER];
+
+                string session_id = SQLHandler.Select (new Dictionary<string, string> { { SQL.TABLE, Database.Tables.SessionHistory.ALIAS },
+                    { SQL.COLUMNS, Database.Tables.Players.CURRENT_SESSION },
+                    { SQL.CONDITION, SQL.IsEqual (Database.Tables.Players.ID, player) }
+                });
+                return SQLHandler.Update (new Dictionary<string, string> { { SQL.TABLE, Database.Tables.Players.ALIAS },
+                    { SQL.CONDITION, SQL.IsEqual (Database.Tables.Players.ID, player) },
+                    { SQL.COLUMN, Database.Tables.Players.CURRENT_SESSION },
+                    { SQL.VALUE, "-1" }
+                }) + SQLHandler.Update (new Dictionary<string, string> { { SQL.TABLE, Database.Tables.SessionHistory.ALIAS },
+                    { SQL.CONDITION, SQL.IsEqual (Database.Tables.SessionHistory.ID, session_id) },
+                    { SQL.COLUMN, Database.Tables.SessionHistory.LOG_OUT_DATE },
+                    { SQL.VALUE, DateTime.UtcNow.ToString (SQL.Format.DATETIME) }
+                });
+            } catch (Exception ex) {
+                return ex.ToString ();
+            }
+            return new InvalidOperationException ().ToString (); /* InvalidOperationException returned if attempting to mine more than asteroid has */
+        }
+
         [FunctionName (HTTP.Endpoints.FIGHT)] /* API Endpoints: /api/fight?ship_1=0&ship_2=1 */
-        public static async Task<string> FIGHT ([HttpTrigger (AuthorizationLevel.Anonymous, HTTP.POST, Route = HTTP.Endpoints.FIGHT)] HttpRequest req) {
+        public static async Task<string> Fight ([HttpTrigger (AuthorizationLevel.Anonymous, HTTP.POST, Route = HTTP.Endpoints.FIGHT)] HttpRequest req) {
             try {
                 string ship_aggressor = req.Query[HTTP.Endpoints.Parameters.SHIP_1];
                 string ship_defender = req.Query[HTTP.Endpoints.Parameters.SHIP_2];
