@@ -287,7 +287,7 @@ namespace BitNaughts {
             return new InvalidOperationException ().ToString (); /* InvalidOperationException returned if attempting to add a value not supported yet */
         }
 
-        [FunctionName (HTTP.Endpoints.FIGHT)] /* API Endpoints: /api/visit?planet=12&ship=5 */
+        [FunctionName (HTTP.Endpoints.FIGHT)] /* API Endpoints: /api/fight?ship_1=0&ship_2=1 */
         public static async Task<string> FIGHT ([HttpTrigger (AuthorizationLevel.Anonymous, HTTP.POST, Route = HTTP.Endpoints.FIGHT)] HttpRequest req) {
             try {
                 string ship_aggressor = req.Query[HTTP.Endpoints.Parameters.SHIP_1];
