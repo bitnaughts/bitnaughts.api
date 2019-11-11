@@ -78,7 +78,7 @@ public static class Database {
                     p_is_habitable BIT NOT NULL,
                     p_is_inhabited BIT NOT NULL,
                     p_kardashev_level DECIMAL(4,2) NOT NULL,
-                    p_economy_type VARCHAR(100) NOT NULL
+                    p_economy_type VARCHAR(100) NULL
                 )",
                 ID = "p_planet_id",
                 SYSTEM_ID = "p_system_id",
