@@ -157,8 +157,8 @@ public static class Database {
             public const string SQL_DEFINITION =
                 @"CREATE TABLE dbo.SessionHistory (
                     sh_session_id INT PRIMARY KEY,
-                    sh_player_id INT NULL,
-                    sh_login DATETIME NULL,
+                    sh_player_id INT NOT NULL,
+                    sh_login DATETIME NOT NULL,
                     sh_logout DATETIME NULL
                 )",
                 ALIAS = "dbo.SessionHistory",
@@ -171,9 +171,9 @@ public static class Database {
             public const string SQL_DEFINITION =
                 @"CREATE TABLE dbo.CombatHistory (
                     ch_combat_id INT PRIMARY KEY,
-                    ch_ship_1_id INT NULL,
-                    ch_ship_2_id INT NULL,
-                    ch_date DATETIME NULL
+                    ch_ship_1_id INT NOT NULL,
+                    ch_ship_2_id INT NOT NULL,
+                    ch_date DATETIME NOT NULL
                 )",
                 ALIAS = "dbo.CombatHistory",
                 ID = "ch_combat_id",

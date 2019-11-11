@@ -13,7 +13,9 @@ public static class HTTP {
             RESET = "reset",
             MINE = "mine",
             VISIT = "visit",
-            FIGHT = "fight";
+            FIGHT = "fight",
+            LOGIN = "login",
+            LOGOUT = "logout";
 
         public static class Parameters {
             public const string FLAG = "flag",
@@ -21,6 +23,7 @@ public static class HTTP {
                 TYPE = "type",
                 ID = "id",
                 PLANET = "planet",
+                PLAYER = "player",
                 ASTEROID = "asteroid",
                 SHIP = "ship",
                 SHIP_1 = "ship_1",
@@ -35,6 +38,5 @@ public static class HTTP {
                     ID = "id";
             }
         }
-
     }
 }
