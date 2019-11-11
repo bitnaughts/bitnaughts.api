@@ -311,7 +311,6 @@ namespace BitNaughts {
                         })
                     }
                 );
-
             } catch (Exception ex) {
                 return ex.ToString ();
             }
@@ -327,6 +326,7 @@ namespace BitNaughts {
                     { SQL.COLUMNS, Database.Tables.Players.CURRENT_SESSION },
                     { SQL.CONDITION, SQL.IsEqual (Database.Tables.Players.ID, player) }
                 });
+                
                 return SQLHandler.Update (new Dictionary<string, string> { { SQL.TABLE, Database.Tables.Players.ALIAS },
                     { SQL.CONDITION, SQL.IsEqual (Database.Tables.Players.ID, player) },
                     { SQL.COLUMN, Database.Tables.Players.CURRENT_SESSION },

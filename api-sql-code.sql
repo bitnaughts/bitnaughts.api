@@ -52,7 +52,7 @@ VALUES
 
 -- api/mine?asteroid=11&ship=0&amount=20
 
--- Mining alway part of an asteroid
+-- Mining only part of an asteroid
 UPDATE dbo.Asteroids SET a_size = 6.59 WHERE a_asteroid_id = 11;
 UPDATE dbo.Ships SET sp_data = 1.00 WHERE sp_ship_id = 0;
 INSERT INTO dbo.Mines

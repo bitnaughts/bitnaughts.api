@@ -5,7 +5,7 @@ public static class SQL {
             NEW_LINE = "\n";
 
         /* How explicit/verbose telemetry receipts are (-1 == no restriction) */
-        public const int MAX_CHARS_RETURED = 500;
+        public const int MAX_CHARS_RETURED = -1;
         public const string VOIDED_CHARS = "\n\r\t";
 
         public const string DATETIME = "yyyy-MM-dd HH:mm:ss.fff";

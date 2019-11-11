@@ -29,7 +29,6 @@ public static class SQLHandler {
             ));
         }
     }
-
     public static string Update (Dictionary<string, string> parameters) {
         string receipt = String.Format ("{0}: Updating Table({1})\n",
             GetRecepitDate (),
