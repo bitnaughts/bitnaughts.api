@@ -290,8 +290,8 @@ namespace BitNaughts {
         [FunctionName (HTTP.Endpoints.MINE)] /* API Endpoints: /api/mine?asteroid=12&ship=5&amount=44 */
         public static async Task<string> Mine ([HttpTrigger (AuthorizationLevel.Anonymous, HTTP.POST, Route = HTTP.Endpoints.MINE)] HttpRequest req) {
             try {
-                string asteroid = req.Query[HTTP.Endpoints.Parameters.ASTEROID];
                 string ship = req.Query[HTTP.Endpoints.Parameters.SHIP];
+                string asteroid = req.Query[HTTP.Endpoints.Parameters.ASTEROID];
                 double mined_amount = double.Parse (req.Query[HTTP.Endpoints.Parameters.AMOUNT]);
 
                 /* Gets current asteroid size to determine if mining fully depleted asteroid */
@@ -303,7 +303,7 @@ namespace BitNaughts {
                     /* Asteroid was not fully mined */
                     if (asteroid_size > mined_amount) {
                         /* Reduce size of asteroid and pass to ship */
-                        return "Result:" + SQLHandler.Update (new Dictionary<string, string> { { SQL.TABLE, Database.Tables.Asteroids.ALIAS },
+                        return SQLHandler.Update (new Dictionary<string, string> { { SQL.TABLE, Database.Tables.Asteroids.ALIAS },
                             { SQL.CONDITION, SQL.IsEqual (Database.Tables.Asteroids.ID, asteroid) },
                             { SQL.COLUMN, Database.Tables.Asteroids.SIZE },
                             { SQL.VALUE, (asteroid_size - mined_amount).ToString ("F") }
@@ -311,16 +311,32 @@ namespace BitNaughts {
                             { SQL.CONDITION, SQL.IsEqual (Database.Tables.Ships.ID, ship) },
                             { SQL.COLUMN, Database.Tables.Ships.DATA },
                             { SQL.VALUE, mined_amount.ToString ("F") }
-                        });
+                        }) + SQLHandler.Insert (
+                            Database.Tables.Mines.ALIAS,
+                            new List<string> {
+                                ship,
+                                asteroid,
+                                mined_amount.ToString ("F"),
+                                DateTime.UtcNow.ToString ();
+                            }
+                        );
                         /* Asteroid was fully depleted when mined */
                     } else if (asteroid_size == mined_amount) {
                         /* Delete asteroid, give all size to ship */
-                        return "Result:" + SQLHandler.Delete (new Dictionary<string, string> { { Database.Tables.Asteroids.ALIAS, SQL.IsEqual (Database.Tables.Asteroids.ID, asteroid) } }) +
+                        return SQLHandler.Delete (new Dictionary<string, string> { { Database.Tables.Asteroids.ALIAS, SQL.IsEqual (Database.Tables.Asteroids.ID, asteroid) } }) +
                             SQLHandler.Update (new Dictionary<string, string> { { SQL.TABLE, Database.Tables.Ships.ALIAS },
                                 { SQL.CONDITION, SQL.IsEqual (Database.Tables.Ships.ID, ship) },
                                 { SQL.COLUMN, Database.Tables.Ships.DATA },
                                 { SQL.VALUE, mined_amount.ToString ("F") }
-                            });
+                            }) + SQLHandler.Insert (
+                                Database.Tables.Mines.ALIAS,
+                                new List<string> {
+                                    ship,
+                                    asteroid,
+                                    mined_amount.ToString ("F"),
+                                    DateTime.UtcNow.ToString ();
+                                }
+                            );
                     }
                 } else {
                     return "Asteroid " + asteroid + " does not exist\n";
