@@ -19,6 +19,7 @@ public static class HTTP {
                 TABLE = "table",
                 TYPE = "type",
                 ID = "id",
+                PLANET = "planet",
                 ASTEROID = "asteroid",
                 SHIP = "ship",
                 AMOUNT = "amount",
