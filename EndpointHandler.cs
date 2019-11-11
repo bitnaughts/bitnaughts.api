@@ -293,7 +293,7 @@ namespace BitNaughts {
                 string ship_aggressor = req.Query[HTTP.Endpoints.Parameters.SHIP_1];
                 string ship_defender = req.Query[HTTP.Endpoints.Parameters.SHIP_2];
 
-                int combat_id = SQLHandler.Select (new Dictionary<string, string> { { SQL.TABLE, Database.Tables.CombatHistory.ALIAS },
+                string combat_id = SQLHandler.Select (new Dictionary<string, string> { { SQL.TABLE, Database.Tables.CombatHistory.ALIAS },
                     { SQL.COLUMNS, SQL.COUNT }
                 });
 

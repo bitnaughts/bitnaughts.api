@@ -26,7 +26,6 @@ public static class SQL {
 
     public const string EQUALS = " = ";
 
-
     /* MS SQL has been shown to perform best when inserting groups of 25 values at a time. See https://www.red-gate.com/simple-talk/sql/performance/comparing-multiple-rows-insert-vs-single-row-insert-with-three-data-load-methods/ */
     public const int INSERT_BATCH_SIZE = 25;
 
