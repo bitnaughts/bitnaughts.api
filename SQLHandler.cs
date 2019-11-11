@@ -24,7 +24,7 @@ public static class SQLHandler {
     public static string Update (Dictionary<string, string> parameters)
     {
         return ExecuteQuery(String.Format(
-            "UPDATE {1} SET {0} WHERE {2}", /* SQL Query to be executed */
+            "UPDATE {0} SET {1} WHERE {2}", /* SQL Query to be executed */
             parameters[SQL.TABLE],
             SQL.IsEqual(parameters[SQL.COLUMN], parameters[SQL.VALUE]),
             parameters[SQL.CONDITION]
