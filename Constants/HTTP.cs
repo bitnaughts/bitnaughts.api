@@ -4,12 +4,15 @@ public static class HTTP {
         DELETE = "delete",
         PUT = "put";
 
+    public const string API_ENDPOINT = "https://bitnaughts.azurewebsites.net/api/";
+
     public static class Endpoints {
         public const string GET = "get",
             SET = "set",
             UPDATE = "update",
             RESET = "reset",
-            MINE = "mine";
+            MINE = "mine",
+            VISIT = "visit";
 
         public static class Parameters {
             public const string FLAG = "flag",

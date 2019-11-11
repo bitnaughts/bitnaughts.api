@@ -8,6 +8,8 @@ public static class SQL {
         public const int MAX_CHARS_RETURED = 500;
         public const string VOIDED_CHARS = "\n\r\t";
 
+        public const string DATETIME = "yyyy-MM-dd HH:mm:ss.fff";
+
         public const string SQL_FILES = "*.sql", SQL_FILE_TYPE = ".sql";
     }
     /* Common conditions */
@@ -19,7 +21,6 @@ public static class SQL {
     /* TABLE NAMES */
     public const string TABLE = "table";
         
-
     public const string CONDITION = "condition";
 
     public const string EQUALS = " = ";

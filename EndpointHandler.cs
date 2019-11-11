@@ -287,6 +287,26 @@ namespace BitNaughts {
             return new InvalidOperationException ().ToString (); /* InvalidOperationException returned if attempting to add a value not supported yet */
         }
 
+        [FunctionName (HTTP.Endpoints.VISIT)] /* API Endpoints: /api/visit?planet=12&ship=5 */
+        public static async Task<string> Visit ([HttpTrigger (AuthorizationLevel.Anonymous, HTTP.POST, Route = HTTP.Endpoints.VISIT)] HttpRequest req) {
+            try {
+                string ship = req.Query[HTTP.Endpoints.Parameters.SHIP];
+                string planet = req.Query[HTTP.Endpoints.Parameters.PLANET];
+
+                return SQLHandler.Insert (
+                    Database.Tables.Visits.ALIAS,
+                    new List<string> {
+                        ship,
+                        planet,
+                        DateTime.UtcNow.ToString(SQL.Format.DATETIME)
+                    }
+                );
+            } catch (Exception ex) {
+                return ex.ToString ();
+            }
+            return new InvalidOperationException ().ToString (); /* InvalidOperationException returned if attempting to mine more than asteroid has */
+        }
+
         [FunctionName (HTTP.Endpoints.MINE)] /* API Endpoints: /api/mine?asteroid=12&ship=5&amount=44 */
         public static async Task<string> Mine ([HttpTrigger (AuthorizationLevel.Anonymous, HTTP.POST, Route = HTTP.Endpoints.MINE)] HttpRequest req) {
             try {
@@ -317,7 +337,7 @@ namespace BitNaughts {
                                 ship,
                                 asteroid,
                                 mined_amount.ToString ("F"),
-                                DateTime.UtcNow.ToString ();
+                                DateTime.UtcNow.ToString(SQL.Format.DATETIME)
                             }
                         );
                         /* Asteroid was fully depleted when mined */
@@ -334,7 +354,7 @@ namespace BitNaughts {
                                     ship,
                                     asteroid,
                                     mined_amount.ToString ("F"),
-                                    DateTime.UtcNow.ToString ();
+                                    DateTime.UtcNow.ToString ()
                                 }
                             );
                     }
