@@ -306,7 +306,8 @@ namespace BitNaughts {
                         WrapValues (new string[] {
                             session_id,
                             player,
-                            DateTime.UtcNow.ToString (SQL.Format.DATETIME)
+                            DateTime.UtcNow.ToString (SQL.Format.DATETIME),
+                            "NULL"
                         })
                     }
                 );
@@ -556,6 +557,7 @@ namespace BitNaughts {
         /* Checking if value is non-numeric to add ''s */
         static float value_numeric = 0;
         public static string WrapValue (string value) {
+            if (value == "NULL") return value;
             return float.TryParse (value, out value_numeric) ? value : "'" + value + "'";
         }
     }
