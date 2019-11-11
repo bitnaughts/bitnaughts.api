@@ -23,12 +23,17 @@ public static class SQLHandler {
 
     public static string Update (Dictionary<string, string> parameters)
     {
-        return ExecuteQuery(String.Format(
+        string receipt = String.Format ("{0}: Updating Table({1})\n",
+            GetRecepitDate (),
+            parameters[SQL.TABLE]
+        );
+        receipt += ExecuteNonQuery(String.Format(
             "UPDATE {0} SET {1} WHERE {2}", /* SQL Query to be executed */
             parameters[SQL.TABLE],
             SQL.IsEqual(parameters[SQL.COLUMN], parameters[SQL.VALUE]),
             parameters[SQL.CONDITION]
         ));
+        return receipt;
     }
     public static string Delete (Dictionary<string, string> values) {
         string receipt = String.Format ("{0}: Adding {1} rows into Tables({2})\n",
