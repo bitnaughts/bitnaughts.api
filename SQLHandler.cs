@@ -13,24 +13,32 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 public static class SQLHandler {
 
     public static string Select (Dictionary<string, string> parameters) {
-        return ExecuteQuery (String.Format (
-            "SELECT {1} FROM {0} WHERE {2}", /* SQL Query to be executed */
-            parameters[SQL.TABLE],
-            parameters[SQL.COLUMNS],
-            parameters[SQL.CONDITION]
-        ));
+        if (parameters.ContainsKey (SQL.CONDITION)) {
+            return ExecuteQuery (String.Format (
+                "SELECT {0} FROM {1} WHERE {2}", /* SQL Query to be executed */
+                parameters[SQL.COLUMNS],
+                parameters[SQL.TABLE],
+                parameters[SQL.CONDITION]
+            ));
+        }
+        else {
+            return ExecuteQuery (String.Format (
+                "SELECT {0} FROM {1}", /* SQL Query to be executed */
+                parameters[SQL.COLUMNS],
+                parameters[SQL.TABLE]
+            ));
+        }
     }
 
-    public static string Update (Dictionary<string, string> parameters)
-    {
+    public static string Update (Dictionary<string, string> parameters) {
         string receipt = String.Format ("{0}: Updating Table({1})\n",
             GetRecepitDate (),
             parameters[SQL.TABLE]
         );
-        receipt += ExecuteNonQuery(String.Format(
+        receipt += ExecuteNonQuery (String.Format (
             "UPDATE {0} SET {1} WHERE {2}", /* SQL Query to be executed */
             parameters[SQL.TABLE],
-            SQL.IsEqual(parameters[SQL.COLUMN], parameters[SQL.VALUE]),
+            SQL.IsEqual (parameters[SQL.COLUMN], parameters[SQL.VALUE]),
             parameters[SQL.CONDITION]
         ));
         return receipt;
@@ -55,7 +63,6 @@ public static class SQLHandler {
         }
         return receipt;
     }
-
     public static string Drop (string[] tables) {
         string receipt = String.Format ("{0}: Dropping {1} tables\n",
             GetRecepitDate (),
@@ -81,7 +88,6 @@ public static class SQLHandler {
         }
         return receipt;
     }
-
     public static string Insert (Dictionary<string, List<string>> values) {
         string receipt = String.Format ("{0}: Adding {1} rows into Tables({2})\n",
             GetRecepitDate (),
@@ -93,7 +99,6 @@ public static class SQLHandler {
         }
         return receipt;
     }
-
     public static string Insert (string table, List<string> values) {
         string receipt = String.Format ("{0}: Adding {1} rows into {2}\n",
             GetRecepitDate (),
@@ -209,6 +214,8 @@ public static class SQLHandler {
             );
         }
     }
+
+    /* Throw-away SQLite implementation */
     public static string ExecuteSQLiteQuery (string query) {
         try {
             /* Defines connection parameters and query logic */
@@ -222,7 +229,7 @@ public static class SQLHandler {
                         /* Holds row results as they are read */
                         List<string> results = new List<string> ();
                         while (reader.Read ()) {
-                            
+
                             /* Dumps values into Object array */
                             Object[] fields = new Object[reader.FieldCount];
                             reader.GetValues (fields);
@@ -256,8 +263,6 @@ public static class SQLHandler {
             );
         }
     }
-
-    /* Manages database connection, runs commands, and returns receipts */
     public static string ExecuteSQLiteNonQuery (string[] queries) {
         string result = "";
         foreach (string query in queries) {
@@ -270,7 +275,7 @@ public static class SQLHandler {
             /* Defines connection parameters and query logic */
             using (SQLiteConnection conn = new SQLiteConnection (@"Data Source=C:\Users\Mutilar\Desktop\TPCH.db;Version=3; FailIfMissing=True; Foreign Keys=True;")) {
                 using (SQLiteCommand cmd = new SQLiteCommand (query, conn)) {
-                    
+
                     /* Connects to database and executes query */
                     conn.Open ();
                     int rows_modified = cmd.ExecuteNonQuery ();
