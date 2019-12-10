@@ -268,7 +268,7 @@ namespace BitNaughts {
                         });
                     case Systems.ALIAS:
                         return String.Format (
-                            "{{ \"system\": \"{0}\", \"planets\": \"{1}\", \"asteroids\": \"{2}\", \"ships\": \"{3}\" }}",
+                            "{{\n\t\"system\": \"{0}\",\n\t\"planets\": \"{1}\",\n\t\"asteroids\": \"{2}\",\n\t\"ships\": \"{3}\"\n}}",
                             SQLHandler.Select (SQL.ALL, Systems.ALIAS, SQLHandler.Equals(Systems.ID, id)),
                             SQLHandler.Select (SQL.ALL, Planets.ALIAS, SQLHandler.Equals(Planets.SYSTEM_ID, id)),
                             SQLHandler.Select (SQL.ALL, Asteroids.ALIAS, SQLHandler.Equals(Asteroids.SYSTEM_ID, id)),
