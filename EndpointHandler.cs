@@ -272,7 +272,7 @@ namespace BitNaughts {
                             SQLHandler.Select (SQL.ALL, Systems.ALIAS, SQLHandler.Equals(Systems.ID, id)),
                             SQLHandler.Select (SQL.ALL, Planets.ALIAS, SQLHandler.Equals(Planets.ID, id)),
                             SQLHandler.Select (SQL.ALL, Asteroids.ALIAS, SQLHandler.Equals(Asteroids.ID, id)),
-                            SQLHandler.Select (SQL.ALL, Ships.ALIAS, SQLHandler.Equals(Ships.ID, id)),
+                            SQLHandler.Select (SQL.ALL, Ships.ALIAS, SQLHandler.Equals(Ships.ID, id))
                         );
                     case Galaxies.ALIAS:
                         //We only want the:
