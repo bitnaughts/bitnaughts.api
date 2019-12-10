@@ -3,6 +3,7 @@ public static class SQL {
         /* CSV-like result output format */
         public const string DELIMITER = ",",
             NEW_LINE = "\n";
+            NEW_LINE = ";";
 
         /* How explicit/verbose telemetry receipts are (-1 == no restriction) */
         public const int MAX_CHARS_RETURED = -1;

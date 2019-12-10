@@ -138,6 +138,7 @@ public static class SQLHandler {
 
                         /* Holds row results as they are read */
                         List<string> results = new List<string> ();
+                        
                         while (reader.Read ()) {
 
                             /* Dumps values into Object array */
