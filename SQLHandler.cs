@@ -224,7 +224,7 @@ public static class SQLHandler {
     }
 
     public static string Equals(string left, string right) {
-        return left + SQL.Equals + right;
+        return left + SQL.EQUALS + right;
     }
 
     public static string GetRecepitDate () {
