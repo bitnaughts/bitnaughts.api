@@ -22,7 +22,7 @@ public static class SQLHandler {
     public static string Select (string columns, string table, string condition) {
         return ExecuteQuery ($"SELECT {columns} FROM {table} WHERE {condition}"); /* SQL Query to be executed */
     }
-    public static string Select (string columns, string table, string condition) {
+    public static string Select (string columns, string table) {
         return ExecuteQuery ($"SELECT {columns} FROM {table}"); /* SQL Query to be executed */
     }
 
