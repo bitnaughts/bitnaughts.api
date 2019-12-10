@@ -267,27 +267,13 @@ namespace BitNaughts {
                             { SQL.CONDITION, Ships.ID + SQL.EQUALS + id }
                         });
                     case Systems.ALIAS:
-                        return SQLHandler.Select (new Dictionary<string, string> { { SQL.COLUMNS, SQL.ALL },
-                            { SQL.TABLE, Systems.ALIAS },
-                            { SQL.CONDITION, Systems.ID + SQL.EQUALS + id }
-                        }) + "|" + SQLHandler.Select (new Dictionary<string, string> { { SQL.COLUMNS, SQL.ALL },
-                            { SQL.TABLE, Asteroids.ALIAS },
-                            { SQL.CONDITION, Asteroids.SYSTEM_ID + SQL.EQUALS + id }
-                        }) + "|" + SQLHandler.Select (new Dictionary<string, string> { { SQL.COLUMNS, SQL.ALL },
-                            { SQL.TABLE, Planets.ALIAS },
-                            { SQL.CONDITION, Planets.SYSTEM_ID + SQL.EQUALS + id }
-                        }) + "|" + SQLHandler.Select (new Dictionary<string, string> { { SQL.COLUMNS, SQL.ALL },
-                            { SQL.TABLE, Ships.ALIAS },
-                            { SQL.CONDITION, Ships.SYSTEM_ID + SQL.EQUALS + id }
-                        });
-
-                        //We want:
-                        //  - All asteroids in system
-                        //  - All stars in system
-                        //  - All planets in system
-                        //  - All ships in system
-                        
-
+                        return String.Format (
+                            "{{ \"system\": \"{0}\", \"asteroids\": \"{1}\", \"planets\": \"{2}\", \"ships\": \"{3}\" }}",
+                            SQLHandler.Select (SQL.ALL, Systems.ALIAS, SQLHandler.Equals(Systems.ID, id)),
+                            SQLHandler.Select (SQL.ALL, Planets.ALIAS, SQLHandler.Equals(Planets.ID, id)),
+                            SQLHandler.Select (SQL.ALL, Asteroids.ALIAS, SQLHandler.Equals(Asteroids.ID, id)),
+                            SQLHandler.Select (SQL.ALL, Ships.ALIAS, SQLHandler.Equals(Ships.ID, id)),
+                        );
                     case Galaxies.ALIAS:
                         //We only want the:
                         //  - System locations

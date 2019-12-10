@@ -14,21 +14,18 @@ public static class SQLHandler {
 
     public static string Select (Dictionary<string, string> parameters) {
         if (parameters.ContainsKey (SQL.CONDITION)) {
-            return ExecuteQuery (String.Format (
-                "SELECT {0} FROM {1} WHERE {2}", /* SQL Query to be executed */
-                parameters[SQL.COLUMNS],
-                parameters[SQL.TABLE],
-                parameters[SQL.CONDITION]
-            ));
-        }
-        else {
-            return ExecuteQuery (String.Format (
-                "SELECT {0} FROM {1}", /* SQL Query to be executed */
-                parameters[SQL.COLUMNS],
-                parameters[SQL.TABLE]
-            ));
+            return Select (parameters[SQL.COLUMNS], parameters[SQL.TABLE], parameters[SQL.CONDITION]);
+        } else {
+            return Select (parameters[SQL.COLUMNS], parameters[SQL.TABLE]);
         }
     }
+    public static string Select (string columns, string table, string condition) {
+        return ExecuteQuery ($"SELECT {columns} FROM {table} WHERE {condition}"); /* SQL Query to be executed */
+    }
+    public static string Select (string columns, string table, string condition) {
+        return ExecuteQuery ($"SELECT {columns} FROM {table}"); /* SQL Query to be executed */
+    }
+
     public static string Update (Dictionary<string, string> parameters) {
         string receipt = String.Format ("{0}: Updating Table({1})\n",
             GetRecepitDate (),
@@ -225,6 +222,11 @@ public static class SQLHandler {
         }
         return output;
     }
+
+    public static string Equals(string left, string right) {
+        return left + SQL.Equals + right;
+    }
+
     public static string GetRecepitDate () {
         return "3" + DateTime.Now.ToString ("yyyy'-'MM'-'dd'T'HH':'mm':'ss.fffffffK").Substring (1);
     }
