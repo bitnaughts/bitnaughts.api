@@ -147,7 +147,7 @@ public static class Ships {
         ALIAS = "dbo.Ships",
         ID = "sp_ship_id",
         PLAYER_ID = "sp_player_id",
-        CURRENT_SYSTEM = "sp_current_system",
+        SYSTEM_ID = "sp_current_system",
         NAME = "sp_name",
         DATA = "sp_data",
         POSITION_X = "sp_position_x",

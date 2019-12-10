@@ -268,9 +268,19 @@ namespace BitNaughts {
                         });
                     case Systems.ALIAS:
                         return SQLHandler.Select (new Dictionary<string, string> { { SQL.COLUMNS, SQL.ALL },
+                            { SQL.TABLE, Systems.ALIAS },
+                            { SQL.CONDITION, Systems.ID + SQL.EQUALS + id }
+                        }) + "|" + SQLHandler.Select (new Dictionary<string, string> { { SQL.COLUMNS, SQL.ALL },
+                            { SQL.TABLE, Asteroids.ALIAS },
+                            { SQL.CONDITION, Asteroids.SYSTEM_ID + SQL.EQUALS + id }
+                        }) + "|" + SQLHandler.Select (new Dictionary<string, string> { { SQL.COLUMNS, SQL.ALL },
+                            { SQL.TABLE, Planets.ALIAS },
+                            { SQL.CONDITION, Planets.SYSTEM_ID + SQL.EQUALS + id }
+                        }) + "|" + SQLHandler.Select (new Dictionary<string, string> { { SQL.COLUMNS, SQL.ALL },
                             { SQL.TABLE, Ships.ALIAS },
-                            { SQL.CONDITION, Ships.ID + SQL.EQUALS + id }
+                            { SQL.CONDITION, Ships.SYSTEM_ID + SQL.EQUALS + id }
                         });
+
                         //We want:
                         //  - All asteroids in system
                         //  - All stars in system
