@@ -277,11 +277,11 @@ namespace BitNaughts {
                         //  - System locations
                         //  - System connections
                         //  - any parameters relevant to rendering the two items above
-                        SQLHandler.Select (new Dictionary<string, string> { { SQL.COLUMNS, SQL.ALL },
-                            { SQL.TABLE, Galaxies.ALIAS },
-                            { SQL.CONDITION, Galaxies.ID + SQL.EQUALS + id }
-                        });
-
+                        return String.Format (
+                            "{{\n\t\"galaxy\": \"{0}\",\n\t\"systems\": \"{1}\"\n}}", //,\n\t\"system_connections\": \"{2}\"\n}}",
+                            SQLHandler.Select (SQL.ALL, Galaxies.ALIAS, SQLHandler.Equals (Galaxies.ID, id)),
+                            SQLHandler.Select (SQL.ALL, Systems.ALIAS, SQLHandler.Equals (Systems.GALAXY_ID, id))
+                        );
                         //Will also likely want 
                         //All System's position_x, position_y
                         //All Systems' links
