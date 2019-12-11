@@ -223,7 +223,7 @@ namespace BitNaughts {
                             }
                         );
                         /* Asteroid was fully depleted when mined */
-                    } else if (asteroid_size == mined_amount) {
+                    } else {
                         /* Delete asteroid, give all size to ship */
                         return SQLHandler.Delete (new Dictionary<string, string> { { Asteroids.ALIAS, SQL.IsEqual (Asteroids.ID, asteroid) } }) +
                             SQLHandler.Update (new Dictionary<string, string> { { SQL.TABLE, Ships.ALIAS },
